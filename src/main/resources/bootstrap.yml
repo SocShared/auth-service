@@ -1,0 +1,10 @@
+server:
+  port: 8080
+  error:
+    whitelabel:
+      enabled: false
+spring:
+  application:
+    name: socshared-microservice-template
+  profiles:
+    active: ${SPRING_PROFILE:local}

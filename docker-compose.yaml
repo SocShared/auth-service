@@ -1,0 +1,32 @@
+version: '3'
+services:
+  postgres-db:
+    image: postgres:11
+    secrets:
+      - postgres_password
+    deploy:
+      replicas: 1
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: 'admin'
+      POSTGRES_PASSWORD: 'admin'
+      POSTGRES_DB: 'db'
+
+  zipkin:
+    image: openzipkin/zipkin:2
+    deploy:
+      replicas: 1
+    ports:
+      - 9411:9411
+
+  microservice-template:
+    container_name: socshared-microservice-template
+    image: vee97/socshared-microservice-template
+    ports:
+      - 8080:8080
+    environment:
+      SPRING_PROFILE: dev
+      POSTGRES_USER: 'admin'
+      POSTGRES_PASSWORD: 'admin'
+      POSTGRES_DB: 'db'
