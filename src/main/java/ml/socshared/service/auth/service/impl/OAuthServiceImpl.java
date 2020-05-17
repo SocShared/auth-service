@@ -49,9 +49,9 @@ public class OAuthServiceImpl implements OAuthService {
                 () -> new AuthenticationException("client_id invalid")
         );
 
-        if (client.getAccessType() == Client.AccessType.CONFIDENTIAL) {
+        if (client.getAccessType() == Client.AccessType.BEARER_ONLY)
+            throw new AuthenticationException("Invalid flow");
 
-        }
         OAuth2TokenResponse response = null;
         if (client.getAccessType() == Client.AccessType.PUBLIC) {
             if (userService.checkData(authRequest).getSuccess()) {
@@ -61,7 +61,7 @@ public class OAuthServiceImpl implements OAuthService {
         }
 
         if ((client.getAccessType() == Client.AccessType.CONFIDENTIAL && !clientService.checkData(clientCredentialsRequest).getSuccess())
-                    || response == null) {
+                || response == null) {
             throw new AuthenticationException("Authentication failed");
         }
 
@@ -70,7 +70,28 @@ public class OAuthServiceImpl implements OAuthService {
 
     @Override
     public OAuth2TokenResponse getTokenByRefreshToken(OAuthFlowRequest request) {
-        return null;
+        log.info("getting token by refresh grant type");
+
+        ClientCredentialsRequest clientCredentialsRequest = ClientCredentialsRequest.builder()
+                .clientId(request.getClientId())
+                .clientSecret(request.getClientSecret())
+                .build();
+
+        Client client = clientRepository.findById(UUID.fromString(request.getClientId())).orElseThrow(
+                () -> new AuthenticationException("client_id invalid")
+        );
+
+        OAuth2TokenResponse response = null;
+        if (jwtTokenProvider.validateRefreshToken(request.getRefreshToken())) {
+            response = jwtTokenProvider.createTokenByRefreshToken(request.getRefreshToken(), client);
+        }
+
+        if ((client.getAccessType() == Client.AccessType.CONFIDENTIAL && !clientService.checkData(clientCredentialsRequest).getSuccess())
+                || response == null) {
+            throw new AuthenticationException("Authentication failed");
+        }
+
+        return response;
     }
 
     @Override
@@ -80,6 +101,28 @@ public class OAuthServiceImpl implements OAuthService {
 
     @Override
     public OAuth2TokenResponse getTokenByClientCredentials(OAuthFlowRequest request) {
-        return null;
+        log.info("getting token by client credential grant type");
+
+        ClientCredentialsRequest clientCredentialsRequest = ClientCredentialsRequest.builder()
+                .clientId(request.getClientId())
+                .clientSecret(request.getClientSecret())
+                .build();
+
+        Client client = clientRepository.findById(UUID.fromString(request.getClientId())).orElseThrow(
+                () -> new AuthenticationException("client_id invalid")
+        );
+
+        if (client.getAccessType() == Client.AccessType.BEARER_ONLY && clientService.checkData(clientCredentialsRequest).getSuccess()) {
+            OAuth2TokenResponse response = null;
+            if (client.getAccessType() == Client.AccessType.PUBLIC) {
+                if (jwtTokenProvider.validateRefreshToken(request.getRefreshToken())) {
+                    response = jwtTokenProvider.createTokenByRefreshToken(request.getRefreshToken(), client);
+                }
+            }
+            return response;
+        }
+
+        throw new AuthenticationException("Authentication failed");
+
     }
 }

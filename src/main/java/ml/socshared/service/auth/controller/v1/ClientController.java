@@ -25,13 +25,13 @@ public class ClientController {
 
     private final ClientService clientService;
 
-    @GetMapping(value = "/clients", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/clients", produces = MediaType.APPLICATION_JSON_VALUE)
     public Page<ClientModel> findAllClients(@Valid @NotNull @RequestParam(name = "page", required = false) Integer page,
                                             @Valid @NotNull @RequestParam(name = "size", required = false) Integer size) {
         return clientService.findAll(page, size);
     }
 
-    @GetMapping(value = "/clients/{clientId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/clients/{clientId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ClientResponse findByClientId(@PathVariable UUID clientId) {
         return clientService.findById(clientId);
     }
