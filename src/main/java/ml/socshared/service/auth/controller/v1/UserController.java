@@ -37,36 +37,31 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping(value = "/protected/users/{userId}/activation", produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/protected/users/{userId}/activation", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserResponse activation(@PathVariable UUID userId) {
         return service.activation(userId);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping(value = "/protected/users/{userId}/deactivation", produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/protected/users/{userId}/deactivation", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserResponse deactivation(@PathVariable UUID userId) {
         return service.deactivation(userId);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping(value = "/protected/users/{userId}/roles/{roleId}/add", produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/protected/users/{userId}/roles/{roleId}/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserResponse addRole(@PathVariable UUID userId, @PathVariable UUID roleId) {
         return service.addRole(userId, roleId);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping(value = "/protected/users/{userId}/roles/{roleId}/delete", produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/protected/users/{userId}/roles/{roleId}/delete", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserResponse removeRole(@PathVariable UUID userId, @PathVariable UUID roleId) {
         return service.removeRole(userId, roleId);
     }
 
     @PreAuthorize("hasRole('CONTENT_MANAGER')")
-    @DeleteMapping(value = "/protected/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/protected/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public void delete(@PathVariable UUID userId) {
         service.deleteById(userId);
     }

@@ -64,35 +64,31 @@ public class ClientController {
     }
 
     @PreAuthorize("hasRole('CONTENT_MANAGER')")
-    @DeleteMapping(value = "/protected/clients/{clientId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/protected/clients/{clientId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public void deleteClient(@PathVariable UUID clientId) {
         clientService.deleteById(clientId);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping(value = "/protected/clients/{clientId}/activation", produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/protected/clients/{clientId}/activation", produces = MediaType.APPLICATION_JSON_VALUE)
     public ClientResponse activation(@PathVariable UUID clientId) {
         return clientService.activation(clientId);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping(value = "/protected/clients/{clientId}/deactivation", produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/protected/clients/{clientId}/deactivation", produces = MediaType.APPLICATION_JSON_VALUE)
     public ClientResponse deactivation(@PathVariable UUID clientId) {
         return clientService.deactivation(clientId);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping(value = "/protected/clients/{clientId}/roles/{roleId}/add", produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/protected/clients/{clientId}/roles/{roleId}/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public ClientResponse addRole(@PathVariable UUID clientId, @PathVariable UUID roleId) {
         return clientService.addRole(clientId, roleId);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping(value = "/protected/clients/{clientId}/roles/{roleId}/delete", produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/protected/clients/{clientId}/roles/{roleId}/delete", produces = MediaType.APPLICATION_JSON_VALUE)
     public ClientResponse removeRole(@PathVariable UUID clientId, @PathVariable UUID roleId) {
         return clientService.removeRole(clientId, roleId);
     }
