@@ -22,7 +22,7 @@ public class OAuth2RefreshToken extends BaseEntity {
     @Column(name = "refresh_token_id")
     private UUID refreshTokenId;
 
-    @Column(name = "refresh_token", nullable = false)
+    @Column(name = "refresh_token", nullable = false, length = 1000)
     private String refreshToken;
 
     @Column(name = "refresh_expires_in", nullable = false)

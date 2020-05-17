@@ -10,7 +10,7 @@ spring:
     active: ${SPRING_PROFILE:local}
 
 jwt:
-  secret: ${SECRET_JWT_KEY:12345}
+  secret: ${SECRET_JWT_KEY:mWDDrMHQ+QJcTnE+afpVz76HrKkGoKQZHnubc52bYN3/bECi32YNjVbR6EDs6BQsveUIh44ubwcktdPc7Sm9Tg==}
   access_token:
     expired: 1800000
   refresh_token:

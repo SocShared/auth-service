@@ -13,8 +13,7 @@ import javax.validation.constraints.*;
 public class NewUserRequest {
 
     @NotNull
-    @Pattern(regexp = "^[a-zA-Z0-9.\\-\\/+=]*$")
-    @Min(value = 3)
+    @Pattern(regexp = "[a-zA-Z0-9+=\\s]{3,60}")
     private String username;
     @NotEmpty
     @Email

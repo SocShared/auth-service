@@ -53,7 +53,7 @@ public class User extends BaseEntity {
     private Boolean accountNonLocked;
     @Column(name = "credentials_non_expired", nullable = false)
     private Boolean credentialsNonExpired;
-    @Column(name = "last_password_reset_date")
+    @Column(name = "last_password_reset_date", nullable = false)
     private Date lastPasswordResetDate;
 
     public User() {
@@ -61,6 +61,7 @@ public class User extends BaseEntity {
         this.accountNonExpired = true;
         this.accountNonLocked = true;
         this.credentialsNonExpired = true;
+        this.lastPasswordResetDate = new Date();
     }
 
     public List<String> getRoleNames() {

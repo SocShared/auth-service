@@ -18,7 +18,7 @@ public interface UserService {
     UserResponse add(NewUserRequest newUserRequest);
     UserResponse update(UUID id, UpdateUserRequest request);
     UserResponse updatePassword(UUID id, UpdatePasswordRequest request);
-    UserResponse deleteById(UUID id);
+    SuccessResponse deleteById(UUID id);
     UserResponse findById(UUID id);
     UserResponse findByUsername(String username);
     UserResponse findByEmail(String email);

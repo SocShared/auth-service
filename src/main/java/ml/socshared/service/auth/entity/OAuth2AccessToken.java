@@ -22,7 +22,7 @@ public class OAuth2AccessToken extends BaseEntity {
     @Column(name = "token_id")
     private UUID tokenId;
 
-    @Column(name = "access_token", nullable = false)
+    @Column(name = "access_token", nullable = false, length = 1000)
     private String accessToken;
 
     @Column(name = "expire_in", nullable = false)
@@ -31,7 +31,7 @@ public class OAuth2AccessToken extends BaseEntity {
     @Column(name = "token_type", nullable = false)
     private String tokenType;
 
-    @Column(name = "scope", nullable = false)
+    @Column(name = "scope")
     private String scope;
 
     @OneToOne(mappedBy = "accessToken")

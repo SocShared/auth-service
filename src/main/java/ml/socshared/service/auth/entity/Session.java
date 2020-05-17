@@ -19,7 +19,6 @@ import java.util.UUID;
 public class Session extends BaseEntity {
 
     @Id
-    @GeneratedValue
     @Column(name = "session_id")
     private UUID sessionId;
 
@@ -41,7 +40,7 @@ public class Session extends BaseEntity {
     @JoinColumn(name = "access_token_id")
     private OAuth2AccessToken accessToken;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "refresh_token_id")
     private OAuth2RefreshToken refreshToken;
 

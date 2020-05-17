@@ -11,7 +11,10 @@ import ml.socshared.service.auth.domain.response.UserResponse;
 import ml.socshared.service.auth.entity.User;
 import ml.socshared.service.auth.entity.Role;
 import ml.socshared.service.auth.entity.base.Status;
+import ml.socshared.service.auth.exception.impl.EmailIsExistsException;
 import ml.socshared.service.auth.exception.impl.HttpNotFoundException;
+import ml.socshared.service.auth.exception.impl.UsernameAndEmailIsExistsException;
+import ml.socshared.service.auth.exception.impl.UsernameIsExistsException;
 import ml.socshared.service.auth.repository.UserRepository;
 import ml.socshared.service.auth.repository.RoleRepository;
 import ml.socshared.service.auth.service.UserService;
@@ -41,6 +44,23 @@ public class UserServiceImpl implements UserService {
     public UserResponse add(NewUserRequest request) {
         log.info("saving -> {}", request);
 
+        boolean isErrorUsername = false;
+        if (userRepository.findByUsername(request.getUsername()).orElse(null) != null) {
+            isErrorUsername = true;
+        }
+        boolean isErrorEmail = false;
+        if (userRepository.findByEmail(request.getEmail()).orElse(null) != null) {
+            isErrorEmail = true;
+        }
+
+        if (isErrorUsername && isErrorEmail) {
+            throw new UsernameAndEmailIsExistsException();
+        } else if (isErrorUsername) {
+            throw new UsernameIsExistsException();
+        } else if (isErrorEmail) {
+            throw new EmailIsExistsException();
+        }
+
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
@@ -65,6 +85,10 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id).orElseThrow(
                 () -> new HttpNotFoundException("Not found user by id: " + id)
         );
+
+        if (userRepository.findByEmail(request.getEmail()).orElse(null) != null) {
+            throw new EmailIsExistsException();
+        }
 
         user.setEmail(request.getEmail());
         user.setFirstname(request.getFirstname());
@@ -91,11 +115,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse deleteById(UUID id) {
+    public SuccessResponse deleteById(UUID id) {
         log.info("deleting by id -> {}", id);
 
-        return new UserResponse(userRepository.setStatus(id, Status.DELETE)
-                .orElseThrow(() -> new HttpNotFoundException("Not found user by id: " + id)));
+        User user = userRepository.findById(id).orElse(null);
+        if (user != null) {
+            user.setStatus(Status.DELETE);
+            user.setEmail(user.getEmail() + "\\" + user.getUserId());
+            user.setUsername(user.getUsername() + "\\" + user.getUserId());
+            user = userRepository.save(user);
+        }
+        return SuccessResponse.builder().success(true).build();
     }
 
     @Override

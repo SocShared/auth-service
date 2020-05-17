@@ -20,6 +20,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -43,6 +45,14 @@ public class ClientServiceImpl implements ClientService {
         client.setName(request.getName());
         client.setValidRedirectUri(request.getValidRedirectUri());
         client.setClientSecret(UUID.randomUUID());;
+
+        Role role = roleRepository.findByName("CONTENT_MANAGER").orElse(null);
+        if (role != null) {
+            Set<Role> roles = new HashSet<>();
+            roles.add(role);
+            client.setRoles(roles);
+        }
+
         return new ClientResponse(clientRepository.save(client));
     }
 

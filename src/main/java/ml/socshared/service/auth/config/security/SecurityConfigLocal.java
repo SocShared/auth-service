@@ -11,7 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 
 @Configuration
 @EnableWebSecurity
-@Profile({Constants.TEST_PROFILE})
+@Profile({Constants.TEST_PROFILE, Constants.LOCAL_PROFILE})
 @Slf4j
 public class SecurityConfigLocal extends WebSecurityConfigurerAdapter {
 

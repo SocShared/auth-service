@@ -21,18 +21,18 @@ public class RoleController {
 
     private final RoleService roleService;
 
-    @GetMapping(value = "/roles", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/public/roles", produces = MediaType.APPLICATION_JSON_VALUE)
     public Page<Role> findAllRoles(@Valid @NotNull @RequestParam(name = "page", required = false) Integer page,
                                    @Valid @NotNull @RequestParam(name = "size", required = false) Integer size) {
         return roleService.findAll(page, size);
     }
 
-    @PostMapping(value = "/roles", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/public/roles", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Role save(@Valid @RequestBody RoleRequest request) {
         return roleService.save(request);
     }
 
-    @DeleteMapping(value = "/roles/{roleId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/public/roles/{roleId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public void delete(@PathVariable UUID roleId) {
         roleService.deleteById(roleId);
     }

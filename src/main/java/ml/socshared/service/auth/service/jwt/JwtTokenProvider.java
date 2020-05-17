@@ -209,6 +209,7 @@ public class JwtTokenProvider {
             session.setUser(user);
             session.setActiveSession(false);
             session.setOfflineSession(true);
+            session.setSessionId(UUID.randomUUID());
         }
         session.setActiveSession(true);
         return session;

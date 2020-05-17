@@ -6,11 +6,11 @@ spring:
     password: ${POSTGRES_PASSWORD:postgres}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   zipkin:
-    base-url: http://zipkin/
+    base-url: http://zipkin:9411/
     service:
       name: ${spring.application.name}
   main:

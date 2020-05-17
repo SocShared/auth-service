@@ -36,6 +36,15 @@ public class OAuthServiceImpl implements OAuthService {
     public OAuth2TokenResponse getTokenByUsernameAndPassword(OAuthFlowRequest request) {
         log.info("getting token by password grant type");
 
+        if (request.getUsername() == null)
+            throw new AuthenticationException("username is invalid");
+
+        if (request.getPassword() == null)
+            throw new AuthenticationException("password is invalid");
+
+        if (request.getClientId() == null)
+            throw new AuthenticationException("client_id is invalid");
+
         AuthRequest authRequest = new AuthRequest();
         authRequest.setUsername(request.getUsername());
         authRequest.setPassword(request.getPassword());
@@ -72,6 +81,12 @@ public class OAuthServiceImpl implements OAuthService {
     public OAuth2TokenResponse getTokenByRefreshToken(OAuthFlowRequest request) {
         log.info("getting token by refresh grant type");
 
+        if (request.getClientId() == null)
+            throw new AuthenticationException("client_id is invalid");
+
+        if (request.getRefreshToken() == null)
+            throw new AuthenticationException("refresh_token is invalid");
+
         ClientCredentialsRequest clientCredentialsRequest = ClientCredentialsRequest.builder()
                 .clientId(request.getClientId())
                 .clientSecret(request.getClientSecret())
@@ -102,6 +117,12 @@ public class OAuthServiceImpl implements OAuthService {
     @Override
     public OAuth2TokenResponse getTokenByClientCredentials(OAuthFlowRequest request) {
         log.info("getting token by client credential grant type");
+
+        if (request.getClientId() == null)
+            throw new AuthenticationException("client_id is invalid");
+
+        if (request.getClientSecret() == null)
+            throw new AuthenticationException("client_secret is invalid");
 
         ClientCredentialsRequest clientCredentialsRequest = ClientCredentialsRequest.builder()
                 .clientId(request.getClientId())
