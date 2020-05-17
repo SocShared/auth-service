@@ -19,13 +19,13 @@ build:
 docker-build:
   stage: docker-build
   script:
-    - sudo docker build -t $CI_DOCKER_LOGIN/socshared-auth-service .
+    - docker build -t $CI_DOCKER_LOGIN/socshared-auth-service .
 
 docker-push:
   stage: docker-push
   script:
-    - sudo docker login -u "$CI_DOCKER_LOGIN" -p "$CI_DOCKER_PASSWORD"
-    - sudo docker push $CI_DOCKER_LOGIN/socshared-auth-service
+    - docker login -u "$CI_DOCKER_LOGIN" -p "$CI_DOCKER_PASSWORD"
+    - docker push $CI_DOCKER_LOGIN/socshared-auth-service
 
 docker-deploy-swarm:
   stage: docker-deploy-swarm
@@ -37,4 +37,4 @@ docker-deploy-swarm:
     - echo "POSTGRES_HOST=auth_postgres_db" >> .env_session
     - echo "POSTGRES_DB=auth" >> .env_session
     - echo "SECRET_JWT_KEY=$SECRET_JWT_KEY" >> .env_session
-    - sudo docker stack deploy -c docker-compose.yaml socshared
+    - docker stack deploy -c docker-compose.yaml socshared
