@@ -136,7 +136,7 @@ public class JwtTokenProvider {
     public boolean validateAccessToken(String token) {
         try {
             Jws<Claims> claims = getJwsClaimsFromToken(token);
-            UUID userId = UUID.fromString(claims.getBody().get("user_id", String.class));
+            UUID userId = UUID.fromString(claims.getBody().getSubject());
             UUID clientId = UUID.fromString(claims.getBody().get("client_id", String.class));
             Date date = claims.getBody().getExpiration();
             if (date.before(new Date())) {
@@ -160,7 +160,7 @@ public class JwtTokenProvider {
     public boolean validateRefreshToken(String token) {
         try {
             Jws<Claims> claims = getJwsClaimsFromToken(token);
-            UUID userId = UUID.fromString(claims.getBody().get("user_id", String.class));
+            UUID userId = UUID.fromString(claims.getBody().getSubject());
             UUID clientId = UUID.fromString(claims.getBody().get("client_id", String.class));
             Date date = claims.getBody().getExpiration();
             if (date.before(new Date())) {
@@ -184,7 +184,7 @@ public class JwtTokenProvider {
 
     public UUID getUserIdByToken(String token) {
         Jws<Claims> claims = getJwsClaimsFromToken(token);
-        return UUID.fromString(claims.getBody().get("user_id", String.class));
+        return UUID.fromString(claims.getBody().getSubject());
     }
 
     private String generationToken(Claims claims, long validityMilliseconds) {
