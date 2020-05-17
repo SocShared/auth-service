@@ -10,7 +10,7 @@ spring:
     active: ${SPRING_PROFILE:dev}
 
 jwt:
-  secret: ${SECRET_JWT_KEY}
+  secret: ${SECRET_JWT_KEY:12345}
   access_token:
     expired: 1800000
   refresh_token:

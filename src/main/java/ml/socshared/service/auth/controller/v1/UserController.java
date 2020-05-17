@@ -53,14 +53,14 @@ public class UserController implements UserApi {
     }
 
     @Override
-    @PatchMapping(value = "/users/{userId}/roles/{roleId}", produces = MediaType.APPLICATION_JSON_VALUE,
+    @PatchMapping(value = "/users/{userId}/roles/{roleId}/add", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public UserResponse addRole(@PathVariable UUID userId, @PathVariable UUID roleId) {
         return service.addRole(userId, roleId);
     }
 
     @Override
-    @PatchMapping(value = "/users/{userId}/roles/{roleId}", produces = MediaType.APPLICATION_JSON_VALUE,
+    @PatchMapping(value = "/users/{userId}/roles/{roleId}/delete", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public UserResponse removeRole(@PathVariable UUID userId, @PathVariable UUID roleId) {
         return service.removeRole(userId, roleId);
