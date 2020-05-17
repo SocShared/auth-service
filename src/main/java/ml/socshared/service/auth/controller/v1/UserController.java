@@ -29,12 +29,6 @@ public class UserController {
 
     private final UserService service;
 
-    @PostMapping(value = "/public/users", produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE)
-    public UserResponse add(@Valid @RequestBody NewUserRequest request) {
-        return service.add(request);
-    }
-
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(value = "/protected/users", produces = MediaType.APPLICATION_JSON_VALUE)
     public Page<UserModel> findAll(@Valid @NotNull @RequestParam(name = "page", required = false) Integer page,
