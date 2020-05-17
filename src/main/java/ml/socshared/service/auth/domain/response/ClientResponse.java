@@ -2,7 +2,6 @@ package ml.socshared.service.auth.domain.response;
 
 import lombok.*;
 import ml.socshared.service.auth.entity.Client;
-import ml.socshared.service.auth.entity.User;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
