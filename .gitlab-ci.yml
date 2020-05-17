@@ -36,5 +36,5 @@ docker-deploy-swarm:
     - echo "POSTGRES_PASSWORD=admin" >> .env_session
     - echo "POSTGRES_HOST=auth_postgres_db" >> .env_session
     - echo "POSTGRES_DB=auth" >> .env_session
-    - echo "SECRET_JWT_KEY=$SECRET_JWT_KEY
+    - echo "SECRET_JWT_KEY=$SECRET_JWT_KEY" >> .env_session
     - sudo docker stack deploy -c docker-compose.yaml socshared
