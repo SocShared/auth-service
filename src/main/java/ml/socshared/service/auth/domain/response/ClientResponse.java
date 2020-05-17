@@ -29,7 +29,9 @@ public class ClientResponse {
         this.activeType = client.getAccessType();
         this.validRedirectUri = client.getValidRedirectUri();
         this.roles = new LinkedHashSet<>();
-        client.getRoles().forEach(role -> roles.add(role.getName()));
+        if (client.getRoles() != null) {
+            client.getRoles().forEach(role -> roles.add(role.getName()));
+        }
     }
 
 }

@@ -29,6 +29,8 @@ public class UserResponse {
         this.firstname = user.getFirstname();
         this.lastname = user.getLastname();
         this.roles = new LinkedHashSet<>();
-        user.getRoles().forEach(role -> roles.add(role.getName()));
+        if (user.getRoles() != null) {
+            user.getRoles().forEach(role -> roles.add(role.getName()));
+        }
     }
 }

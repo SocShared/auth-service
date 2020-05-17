@@ -21,7 +21,7 @@ public class RoleController {
 
     private final RoleService roleService;
 
-    @GetMapping(value = "/roles", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/roles", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public Page<Role> findAllRoles(@Valid @NotNull @RequestParam(name = "page", required = false) Integer page,
                                    @Valid @NotNull @RequestParam(name = "size", required = false) Integer size) {
         return roleService.findAll(page, size);

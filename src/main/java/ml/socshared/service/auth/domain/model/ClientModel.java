@@ -9,5 +9,5 @@ public interface ClientModel {
     UUID getClientSecret();
     String getName();
     Client.AccessType getAccessType();
-    String getValidRedirect();
+    String getValidRedirectUri();
 }

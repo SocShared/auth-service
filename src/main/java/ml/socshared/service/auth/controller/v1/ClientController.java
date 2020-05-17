@@ -25,19 +25,19 @@ public class ClientController {
 
     private final ClientService clientService;
 
-    @GetMapping(value = "/clients", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/clients", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public Page<ClientModel> findAllClients(@Valid @NotNull @RequestParam(name = "page", required = false) Integer page,
                                             @Valid @NotNull @RequestParam(name = "size", required = false) Integer size) {
         return clientService.findAll(page, size);
     }
 
-    @GetMapping(value = "/clients/{clientId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/clients/{clientId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ClientResponse findByClientId(@PathVariable UUID clientId) {
         return clientService.findById(clientId);
     }
 
     @PostMapping(value = "/clients", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ClientResponse addClient(@Valid @RequestParam NewClientRequest request) {
+    public ClientResponse addClient(@Valid @RequestBody NewClientRequest request) {
         if (request.getAccessType() == Client.AccessType.CONFIDENTIAL || request.getAccessType() == Client.AccessType.PUBLIC) {
             if (request.getValidRedirectUri() == null || request.getValidRedirectUri().isEmpty()) {
                 throw new HttpBadRequestException("valid redirect uri: " + request.getValidRedirectUri());
@@ -47,7 +47,7 @@ public class ClientController {
     }
 
     @PatchMapping(value = "/clients/{clientId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ClientResponse updateClient(@PathVariable UUID clientId, @Valid @RequestParam NewClientRequest request) {
+    public ClientResponse updateClient(@PathVariable UUID clientId, @Valid @RequestBody NewClientRequest request) {
         if (request.getAccessType() == Client.AccessType.CONFIDENTIAL || request.getAccessType() == Client.AccessType.PUBLIC) {
             if (request.getValidRedirectUri() == null || request.getValidRedirectUri().isEmpty()) {
                 throw new HttpBadRequestException("valid redirect uri: " + request.getValidRedirectUri());
@@ -57,7 +57,7 @@ public class ClientController {
     }
 
     @DeleteMapping(value = "/clients/{clientId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void updateClient(@PathVariable UUID clientId) {
+    public void deleteClient(@PathVariable UUID clientId) {
         clientService.deleteById(clientId);
     }
 

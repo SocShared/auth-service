@@ -35,7 +35,7 @@ public class UserController implements UserApi {
     }
 
     @Override
-    @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public Page<UserModel> findAll(@Valid @NotNull @RequestParam(name = "page", required = false) Integer page,
                                    @Valid @NotNull @RequestParam(name = "size", required = false) Integer size) {
         return service.findAll(page, size);
@@ -76,12 +76,12 @@ public class UserController implements UserApi {
         return service.deleteById(userId);
     }
 
-    @PatchMapping(value = "/users/{userId}")
+    @PatchMapping(value = "/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public UserResponse updateData(@PathVariable UUID userId, @Valid @RequestBody UpdateUserRequest request) {
         return service.update(userId, request);
     }
 
-    @PatchMapping(value = "/users/{userId}/password")
+    @PatchMapping(value = "/users/{userId}/password", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public UserResponse updatePassword(@PathVariable UUID userId, @Valid @RequestBody UpdatePasswordRequest request) {
         return service.updatePassword(userId, request);
     }

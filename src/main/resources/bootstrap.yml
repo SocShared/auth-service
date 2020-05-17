@@ -7,7 +7,7 @@ spring:
   application:
     name: socshared-auth-service
   profiles:
-    active: ${SPRING_PROFILE:dev}
+    active: ${SPRING_PROFILE:local}
 
 jwt:
   secret: ${SECRET_JWT_KEY:12345}

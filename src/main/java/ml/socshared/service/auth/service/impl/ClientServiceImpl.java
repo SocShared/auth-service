@@ -42,7 +42,7 @@ public class ClientServiceImpl implements ClientService {
         client.setAccessType(request.getAccessType());
         client.setName(request.getName());
         client.setValidRedirectUri(request.getValidRedirectUri());
-
+        client.setClientSecret(UUID.randomUUID());;
         return new ClientResponse(clientRepository.save(client));
     }
 

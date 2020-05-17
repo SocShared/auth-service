@@ -17,7 +17,6 @@ public class NewClientRequest {
     private String name;
 
     @NotNull
-    @Enumerated(EnumType.STRING)
     private Client.AccessType accessType;
 
     private String validRedirectUri;
