@@ -16,10 +16,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -118,10 +115,10 @@ public class JwtTokenProvider {
 
     public UserDetails getUserDetails(String token) {
         Claims claims =  Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
-        String[] roles = claims.get("roles", String[].class);
+        ArrayList<String> roles = claims.get("roles", ArrayList.class);
 
         return SpringUserDetails.builder()
-                .authorities(Arrays.stream(roles).map(SimpleGrantedAuthority::new).collect(Collectors.toList()))
+                .authorities(roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()))
                 .username(claims.get("username", String.class))
                 .firstName(claims.get("firstname", String.class))
                 .lastName(claims.get("lastname", String.class))
