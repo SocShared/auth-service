@@ -45,7 +45,7 @@ public class OAuthServiceImpl implements OAuthService {
 
         if (userService.checkData(authRequest).getSuccess() && clientService.checkData(clientCredentialsRequest).getSuccess()) {
             User user = userRepository.findByUsername(request.getUsername()).orElse(new User());
-            Client client = clientService.findById(request.getClientId());
+            Client client = clientService.findById(UUID.fromString(request.getClientId()));
 
             return jwtTokenProvider.createTokenByUsernameAndPassword(user, client);
         }

@@ -80,7 +80,7 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public SuccessResponse checkData(ClientCredentialsRequest request) {
         log.info("checking c and password");
-        Client client = clientRepository.findByClientIdAndClientSecret(UUID.fromString(request.getClientId()), request.getClientSecret()).orElse(null);
+        Client client = clientRepository.findByClientIdAndClientSecret(request.getClientId(), request.getClientSecret()).orElse(null);
 
         return SuccessResponse.builder().success(client != null).build();
     }

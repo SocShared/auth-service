@@ -5,7 +5,7 @@ server:
       enabled: false
 spring:
   application:
-    name: socshared-microservice-template
+    name: socshared-auth-service
   profiles:
     active: ${SPRING_PROFILE:dev}
 

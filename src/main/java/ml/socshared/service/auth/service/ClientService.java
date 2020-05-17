@@ -14,7 +14,7 @@ public interface ClientService {
     Client add(NewClientRequest request);
     Client update(UUID id, NewClientRequest request);
     void deleteById(UUID id);
-    Client findById(String id);
+    Client findById(UUID id);
     Page<Client> findAll(Integer page, Integer size);
     SuccessResponse checkData(ClientCredentialsRequest request);
 
