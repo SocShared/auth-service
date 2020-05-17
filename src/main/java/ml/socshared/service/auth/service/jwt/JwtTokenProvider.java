@@ -37,7 +37,6 @@ public class JwtTokenProvider {
     private final AuthenticationUserService authenticationUserService;
     private final UserService userService;
     private final SessionService sessionService;
-    private final OAuthService oAuthService;
 
     public OAuth2TokenResponse createTokenByUsernameAndPassword(User user, Client client) {
         Claims claimsAccess = JwtClaimsBuilder.buildJwtClaimsByUsernameAndPassword(user, client);
