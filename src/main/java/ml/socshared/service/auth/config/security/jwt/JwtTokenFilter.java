@@ -1,0 +1,46 @@
+package ml.socshared.service.auth.config.security.jwt;
+
+import lombok.RequiredArgsConstructor;
+import ml.socshared.service.auth.domain.model.SpringUserDetails;
+import ml.socshared.service.auth.service.jwt.JwtTokenProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.filter.GenericFilterBean;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+
+@RequiredArgsConstructor
+public class JwtTokenFilter extends GenericFilterBean {
+
+    private final JwtTokenProvider jwtTokenProvider;
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        if (request instanceof HttpServletRequest) {
+            HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+            String token = resolveToken(httpServletRequest);
+            if (token != null && jwtTokenProvider.validateAccessToken(token)) {
+                UserDetails userDetails = jwtTokenProvider.getUserDetails(token);
+                Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
+        }
+        chain.doFilter(request, response);
+    }
+
+    private String resolveToken(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer")) {
+            return token.substring(6).trim();
+        }
+        return null;
+    }
+
+}

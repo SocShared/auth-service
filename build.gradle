@@ -23,15 +23,22 @@ dependencies {
     implementation 'com.h2database:h2'
     implementation 'org.postgresql:postgresql'
     implementation 'com.google.guava:guava:28.1-jre'
+    // Валидатор ограничений пользовательских паролей
+    implementation 'org.passay:passay:1.6.0'
+    // Генерация JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.10.5'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.10.5'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.10.5'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 }
 
 bootJar {
-    baseName = 'socshared-microservice-template'
+    baseName = 'socshared-auth-service'
     version = '1.0.0-SNAPSHOT'
 }
 
 springBoot {
-    mainClassName = 'ml.socshared.template.Application'
+    mainClassName = 'ml.socshared.service.auth.Application'
 }

@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:facebook_db?useUnicode=yes&characterEncoding=UTF-8
+    url: jdbc:h2:mem:auth_db?useUnicode=yes&characterEncoding=UTF-8
     driver-class-name: org.h2.Driver
     username: sa
   jpa:

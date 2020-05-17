@@ -7,4 +7,11 @@ spring:
   application:
     name: socshared-microservice-template
   profiles:
-    active: ${SPRING_PROFILE:local}
+    active: ${SPRING_PROFILE:dev}
+
+jwt:
+  secret: ${SECRET_JWT_KEY}
+  access_token:
+    expired: 1800000
+  refresh_token:
+    expired: 2592000000
