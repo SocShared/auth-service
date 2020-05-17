@@ -1,5 +1,6 @@
 package ml.socshared.service.auth.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import ml.socshared.service.auth.entity.base.BaseEntity;
 
@@ -47,7 +48,12 @@ public class Client extends BaseEntity {
     private SocsharedService service;
 
     public enum AccessType {
-        CONFIDENTIAL, PUBLIC, BEARER_ONLY
+        @JsonProperty("confidential")
+        CONFIDENTIAL,
+        @JsonProperty("public")
+        PUBLIC,
+        @JsonProperty("bearer_only")
+        BEARER_ONLY
     }
 
 }

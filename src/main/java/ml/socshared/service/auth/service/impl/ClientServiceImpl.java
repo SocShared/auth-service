@@ -1,12 +1,16 @@
 package ml.socshared.service.auth.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import ml.socshared.service.auth.domain.request.AuthRequest;
+import ml.socshared.service.auth.domain.model.ClientModel;
 import ml.socshared.service.auth.domain.request.ClientCredentialsRequest;
 import ml.socshared.service.auth.domain.request.NewClientRequest;
+import ml.socshared.service.auth.domain.response.ClientResponse;
 import ml.socshared.service.auth.domain.response.SuccessResponse;
+import ml.socshared.service.auth.domain.response.UserResponse;
 import ml.socshared.service.auth.entity.Client;
+import ml.socshared.service.auth.entity.Role;
 import ml.socshared.service.auth.entity.User;
+import ml.socshared.service.auth.entity.base.Status;
 import ml.socshared.service.auth.exception.impl.HttpNotFoundException;
 import ml.socshared.service.auth.repository.ClientRepository;
 import ml.socshared.service.auth.repository.RoleRepository;
@@ -17,7 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
-import java.util.regex.Pattern;
 
 @Service
 @Slf4j
@@ -32,7 +35,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public Client add(NewClientRequest request) {
+    public ClientResponse add(NewClientRequest request) {
         log.info("saving -> {}", request);
 
         Client client = new Client();
@@ -40,11 +43,11 @@ public class ClientServiceImpl implements ClientService {
         client.setName(request.getName());
         client.setValidRedirectUri(request.getValidRedirectUri());
 
-        return clientRepository.save(client);
+        return new ClientResponse(clientRepository.save(client));
     }
 
     @Override
-    public Client update(UUID id, NewClientRequest request) {
+    public ClientResponse update(UUID id, NewClientRequest request) {
         log.info("saving -> {}", request);
 
         Client client = clientRepository.findById(id)
@@ -54,27 +57,45 @@ public class ClientServiceImpl implements ClientService {
         client.setAccessType(request.getAccessType());
         client.setValidRedirectUri(request.getValidRedirectUri());
 
-        return clientRepository.save(client);
+        return new ClientResponse(clientRepository.save(client));
     }
 
     @Override
-    public void deleteById(UUID id) {
+    public ClientResponse activation(UUID id) {
+        log.info("activation by id -> {}", id);
+
+        return new ClientResponse(clientRepository.setStatus(id, Status.ACTIVE)
+                .orElseThrow(() -> new HttpNotFoundException("Not found user by id: " + id)));
+    }
+
+    @Override
+    public ClientResponse deactivation(UUID id) {
+        log.info("deactivating by id -> {}", id);
+
+        return new ClientResponse(clientRepository.setStatus(id, Status.NOT_ACTIVE)
+                .orElseThrow(() -> new HttpNotFoundException("Not found user by id: " + id)));
+    }
+
+    @Override
+    public ClientResponse deleteById(UUID id) {
         log.info("deleting by id -> {}", id);
-        clientRepository.deleteById(id);
+
+        return new ClientResponse(clientRepository.setStatus(id, Status.DELETE)
+                .orElseThrow(() -> new HttpNotFoundException("Not found user by id: " + id)));
     }
 
     @Override
-    public Client findById(UUID id) {
+    public ClientResponse findById(UUID id) {
         log.info("find by id -> {}", id);
-        return clientRepository.findById(id)
-                .orElseThrow(() -> new HttpNotFoundException("Not found client by id: " + id));
+        return new ClientResponse(clientRepository.findById(id)
+                .orElseThrow(() -> new HttpNotFoundException("Not found client by id: " + id)));
     }
 
     @Override
-    public Page<Client> findAll(Integer page, Integer size) {
+    public Page<ClientModel> findAll(Integer page, Integer size) {
         log.info("find all");
         Pageable pageable = PageRequest.of(page, size);
-        return clientRepository.findAll(pageable);
+        return clientRepository.findAllClients(pageable);
     }
 
     @Override
@@ -83,5 +104,33 @@ public class ClientServiceImpl implements ClientService {
         Client client = clientRepository.findByClientIdAndClientSecret(request.getClientId(), request.getClientSecret()).orElse(null);
 
         return SuccessResponse.builder().success(client != null).build();
+    }
+
+    @Override
+    public ClientResponse addRole(UUID id, UUID roleId) {
+        log.info("adding role -> {}", roleId);
+
+        Role role = roleRepository.findById(roleId).orElseThrow(() -> new HttpNotFoundException("Not found role by id: " + roleId));
+
+        Client client = clientRepository.findById(id).orElseThrow(() -> new HttpNotFoundException("Not found client by id: " + id));
+
+        client.getRoles().add(role);
+        client = clientRepository.save(client);
+
+        return new ClientResponse(client);
+    }
+
+    @Override
+    public ClientResponse removeRole(UUID id, UUID roleId) {
+        log.info("removing role -> {}", roleId);
+
+        Role role = roleRepository.findById(roleId).orElseThrow(() -> new HttpNotFoundException("Not found role by id: " + roleId));
+
+        Client client = clientRepository.findById(id).orElseThrow(() -> new HttpNotFoundException("Not found client by id: " + id));
+
+        client.getRoles().remove(role);
+        client = clientRepository.save(client);
+
+        return new ClientResponse(client);
     }
 }

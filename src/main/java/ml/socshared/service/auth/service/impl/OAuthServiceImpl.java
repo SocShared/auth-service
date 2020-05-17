@@ -11,6 +11,7 @@ import ml.socshared.service.auth.domain.response.UserResponse;
 import ml.socshared.service.auth.entity.Client;
 import ml.socshared.service.auth.entity.User;
 import ml.socshared.service.auth.exception.impl.AuthenticationException;
+import ml.socshared.service.auth.repository.ClientRepository;
 import ml.socshared.service.auth.repository.UserRepository;
 import ml.socshared.service.auth.service.ClientService;
 import ml.socshared.service.auth.service.OAuthService;
@@ -28,6 +29,7 @@ public class OAuthServiceImpl implements OAuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
     private final UserRepository userRepository;
+    private final ClientRepository clientRepository;
     private final ClientService clientService;
 
     @Override
@@ -43,13 +45,27 @@ public class OAuthServiceImpl implements OAuthService {
                 .clientSecret(request.getClientSecret())
                 .build();
 
-        if (userService.checkData(authRequest).getSuccess() && clientService.checkData(clientCredentialsRequest).getSuccess()) {
-            User user = userRepository.findByUsername(request.getUsername()).orElse(new User());
-            Client client = clientService.findById(UUID.fromString(request.getClientId()));
+        Client client = clientRepository.findById(UUID.fromString(request.getClientId())).orElseThrow(
+                () -> new AuthenticationException("client_id invalid")
+        );
 
-            return jwtTokenProvider.createTokenByUsernameAndPassword(user, client);
+        if (client.getAccessType() == Client.AccessType.CONFIDENTIAL) {
+
         }
-        throw new AuthenticationException("Authentication failed");
+        OAuth2TokenResponse response = null;
+        if (client.getAccessType() == Client.AccessType.PUBLIC) {
+            if (userService.checkData(authRequest).getSuccess()) {
+                User user = userRepository.findByUsername(request.getUsername()).orElse(new User());
+                response = jwtTokenProvider.createTokenByUsernameAndPassword(user, client);
+            }
+        }
+
+        if ((client.getAccessType() == Client.AccessType.CONFIDENTIAL && !clientService.checkData(clientCredentialsRequest).getSuccess())
+                    || response == null) {
+            throw new AuthenticationException("Authentication failed");
+        }
+
+        return response;
     }
 
     @Override

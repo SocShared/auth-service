@@ -3,8 +3,11 @@ package ml.socshared.service.auth.controller.v1;
 import lombok.RequiredArgsConstructor;
 import ml.socshared.service.auth.domain.model.UserModel;
 import ml.socshared.service.auth.domain.request.NewUserRequest;
+import ml.socshared.service.auth.domain.request.UpdatePasswordRequest;
+import ml.socshared.service.auth.domain.request.UpdateUserRequest;
 import ml.socshared.service.auth.domain.response.UserResponse;
 import ml.socshared.service.auth.entity.Role;
+import ml.socshared.service.auth.repository.UserRepository;
 import ml.socshared.service.auth.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
@@ -71,5 +74,15 @@ public class UserController implements UserApi {
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public UserResponse delete(@PathVariable UUID userId) {
         return service.deleteById(userId);
+    }
+
+    @PatchMapping(value = "/users/{userId}")
+    public UserResponse updateData(@PathVariable UUID userId, @Valid @RequestBody UpdateUserRequest request) {
+        return service.update(userId, request);
+    }
+
+    @PatchMapping(value = "/users/{userId}/password")
+    public UserResponse updatePassword(@PathVariable UUID userId, @Valid @RequestBody UpdatePasswordRequest request) {
+        return service.updatePassword(userId, request);
     }
 }

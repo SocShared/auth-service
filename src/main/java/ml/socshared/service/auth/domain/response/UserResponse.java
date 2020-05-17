@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import ml.socshared.service.auth.entity.User;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -16,6 +18,7 @@ public class UserResponse {
     private String email;
     private String firstname;
     private String lastname;
+    private Set<String> roles;
 
     public UserResponse() {}
 
@@ -25,5 +28,7 @@ public class UserResponse {
         this.email = user.getEmail();
         this.firstname = user.getFirstname();
         this.lastname = user.getLastname();
+        this.roles = new LinkedHashSet<>();
+        user.getRoles().forEach(role -> roles.add(role.getName()));
     }
 }

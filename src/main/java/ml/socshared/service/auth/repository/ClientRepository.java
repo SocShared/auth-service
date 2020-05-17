@@ -1,11 +1,18 @@
 package ml.socshared.service.auth.repository;
 
+import ml.socshared.service.auth.domain.model.ClientModel;
+import ml.socshared.service.auth.domain.model.UserModel;
 import ml.socshared.service.auth.entity.Client;
 import ml.socshared.service.auth.entity.User;
+import ml.socshared.service.auth.entity.base.Status;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -16,4 +23,17 @@ public interface ClientRepository extends JpaRepository<Client, UUID> {
     Optional<Client> findByClientIdAndClientSecret(@Param("clientId") String clientId, @Param("clientSecret") String clientSecret);
     @Query("select c from Client c where c.clientId = :clientId")
     Optional<Client> findByClientId(@Param("clientId") String clientId);
+    @Query("select c from Client c where c.status = 'ACTIVE' or c.status = 'NOT_ACTIVE'")
+    Page<ClientModel> findAllClients(Pageable pageable);
+    @Query("select c from Client c where c.status = 'ACTIVE'")
+    Page<ClientModel> findActiveClients(Pageable pageable);
+    @Query("select c from Client c where c.status = 'NOT_ACTIVE'")
+    Page<ClientModel> findNotActiveClients(Pageable pageable);
+    @Query("select c from Client c where c.status = 'DELETE'")
+    Page<ClientModel> findDeletedClients(Pageable pageable);
+
+    @Transactional
+    @Modifying
+    @Query("update Client c set c.status = :status where c.clientId = :id")
+    Optional<Client> setStatus(@Param("id") UUID id, @Param("status") Status status);
 }
