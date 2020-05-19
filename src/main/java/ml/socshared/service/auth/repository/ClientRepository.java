@@ -23,6 +23,10 @@ public interface ClientRepository extends JpaRepository<Client, UUID> {
     Optional<Client> findByClientIdAndClientSecret(@Param("clientId") String clientId, @Param("clientSecret") String clientSecret);
     @Query("select c from Client c where c.clientId = :clientId")
     Optional<Client> findByClientId(@Param("clientId") String clientId);
+    @Query("select c from Client c where c.clientId = :clientId and c.user.userId = :userId")
+    Optional<Client> findByClientIdAndUserId(@Param("clientId") String clientId, @Param("userId") String userId);
+    @Query("select c from Client c where c.user.userId = :userId")
+    Page<ClientModel> findByUserId(String userId, Pageable pageable);
     @Query("select c from Client c where c.status = 'ACTIVE' or c.status = 'NOT_ACTIVE'")
     Page<ClientModel> findAllClients(Pageable pageable);
     @Query("select c from Client c where c.status = 'ACTIVE'")

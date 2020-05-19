@@ -1,5 +1,6 @@
 package ml.socshared.service.auth.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ml.socshared.service.auth.domain.model.ClientModel;
 import ml.socshared.service.auth.domain.request.ClientCredentialsRequest;
@@ -14,6 +15,7 @@ import ml.socshared.service.auth.entity.base.Status;
 import ml.socshared.service.auth.exception.impl.HttpNotFoundException;
 import ml.socshared.service.auth.repository.ClientRepository;
 import ml.socshared.service.auth.repository.RoleRepository;
+import ml.socshared.service.auth.repository.UserRepository;
 import ml.socshared.service.auth.service.ClientService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,18 +28,15 @@ import java.util.UUID;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ClientServiceImpl implements ClientService {
 
     private final ClientRepository clientRepository;
+    private final UserRepository userRepository;
     private final RoleRepository roleRepository;
 
-    public ClientServiceImpl(ClientRepository clientRepository, RoleRepository roleRepository) {
-        this.clientRepository = clientRepository;
-        this.roleRepository = roleRepository;
-    }
-
     @Override
-    public ClientResponse add(NewClientRequest request) {
+    public ClientResponse add(UUID userId, NewClientRequest request) {
         log.info("saving -> {}", request);
 
         Client client = new Client();
@@ -46,6 +45,8 @@ public class ClientServiceImpl implements ClientService {
         client.setValidRedirectUri(request.getValidRedirectUri());
         client.setClientSecret(UUID.randomUUID());;
 
+        User user = userRepository.findById(userId).orElseThrow(() -> new HttpNotFoundException("Not found user by id: " + userId));
+        client.setUser(user);
         Role role = roleRepository.findByName("CONTENT_MANAGER").orElse(null);
         if (role != null) {
             Set<Role> roles = new HashSet<>();
@@ -57,10 +58,10 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public ClientResponse update(UUID id, NewClientRequest request) {
+    public ClientResponse update(UUID userId, UUID id, NewClientRequest request) {
         log.info("saving -> {}", request);
 
-        Client client = clientRepository.findById(id)
+        Client client = clientRepository.findByClientIdAndUserId(id.toString(), userId.toString())
                 .orElseThrow(() -> new HttpNotFoundException("Not found client by id: " + id));
 
         client.setName(request.getName());
@@ -142,5 +143,17 @@ public class ClientServiceImpl implements ClientService {
         client = clientRepository.save(client);
 
         return new ClientResponse(client);
+    }
+
+    @Override
+    public ClientResponse findByUserIdAndClientId(UUID userId, UUID clientId) {
+        return new ClientResponse(clientRepository.findByClientIdAndUserId(clientId.toString(), userId.toString())
+                .orElseThrow(() -> new HttpNotFoundException("Not found by user id and client id")));
+    }
+
+    @Override
+    public Page<ClientModel> findByUserId(UUID userId, Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return clientRepository.findByUserId(userId.toString(), pageable);
     }
 }

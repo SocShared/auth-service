@@ -4,7 +4,9 @@ import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ml.socshared.service.auth.domain.model.SpringUserDetails;
+import ml.socshared.service.auth.domain.request.ServiceTokenRequest;
 import ml.socshared.service.auth.domain.response.OAuth2TokenResponse;
+import ml.socshared.service.auth.domain.response.ServiceTokenResponse;
 import ml.socshared.service.auth.domain.response.UserResponse;
 import ml.socshared.service.auth.entity.*;
 import ml.socshared.service.auth.exception.impl.AuthenticationException;
@@ -16,6 +18,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,7 +44,9 @@ public class JwtTokenProvider {
         Claims claimsRefresh = Jwts.claims().setSubject(user.getUserId().toString());
         String refreshToken = generationToken(claimsRefresh, validityRefreshTokenInMilliseconds);
 
-        Session session = createSession(client, user);
+        String sessionId = claimsAccess.get("session_state", String.class);
+
+        Session session = createSession(client, user, UUID.fromString(sessionId));
         OAuth2TokenResponse oAuth2TokenResponse = OAuth2TokenResponse.builder()
                 .accessToken(accessToken)
                 .expireIn(claimsAccess.getExpiration().getTime() + "")
@@ -118,15 +123,61 @@ public class JwtTokenProvider {
         ArrayList<String> roles = claims.get("roles", ArrayList.class);
 
         return SpringUserDetails.builder()
-                .authorities(roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()))
+                .authorities(roles.stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role)).collect(Collectors.toList()))
                 .username(claims.get("username", String.class))
                 .firstName(claims.get("firstname", String.class))
                 .lastName(claims.get("lastname", String.class))
                 .email(claims.get("email", String.class))
-                .accountNonExpired(claims.get("account_non_expired", Boolean.class))
                 .accountNonLocked(claims.get("account_non_locked", Boolean.class))
-                .credentialsNonExpired(claims.get("credentials_non_expired", Boolean.class))
-                .lastPasswordResetDate(new Date(claims.get("last_password_reset_date", Long.class)))
+                .build();
+    }
+
+    public ServiceTokenResponse buildServiceToken(ServiceTokenRequest request) {
+        Claims claimsAccess = Jwts.claims().setSubject(request.getFromServiceId().toString());
+        claimsAccess.put("auth_time", new Date().getTime());
+        claimsAccess.put("typ", "bearer");
+        claimsAccess.put("from_service", request.getFromServiceId().toString());
+        claimsAccess.put("to_service", request.getToServiceId().toString());
+
+        if (request.getUsersAccessToken() != null) {
+            Claims claimsFromUserToken = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(request.getUsersAccessToken()).getBody();
+            String userId = claimsFromUserToken.getSubject();
+            claimsAccess.put("user_id", userId);
+            String sessionId = claimsFromUserToken.get("session_state", String.class);
+            claimsAccess.put("session_state", sessionId);
+            ArrayList<String> roles = claimsFromUserToken.get("roles", ArrayList.class);
+            roles.add("SERVICE");
+            claimsAccess.put("roles", roles);
+            String username = claimsFromUserToken.get("username", String.class);
+            claimsAccess.put("username", username);
+            String firstname = claimsFromUserToken.get("firstname", String.class);
+            claimsAccess.put("firstname", firstname);
+            String lastname = claimsFromUserToken.get("lastname", String.class);
+            claimsAccess.put("lastname", lastname);
+            String email = claimsFromUserToken.get("email", String.class);
+            claimsAccess.put("email", email);
+            Boolean emailVerified = claimsFromUserToken.get("email_verified", Boolean.class);
+            claimsAccess.put("email_verified", emailVerified);
+            Boolean accountNonLocked = claimsFromUserToken.get("account_non_locked", Boolean.class);
+            claimsAccess.put("account_non_locked", accountNonLocked);
+            Boolean isResetPassword = claimsFromUserToken.get("is_reset_password", Boolean.class);
+            claimsAccess.put("is_reset_password", isResetPassword);
+        }
+
+        Date now = new Date();
+        Date expireIn = new Date(now.getTime() + 1000 * 60 * 30);
+        JwtBuilder builder = Jwts.builder()
+                .setClaims(claimsAccess)
+                .setIssuedAt(now)
+                .setExpiration(expireIn)
+                .signWith(SignatureAlgorithm.HS512, secretKey);
+
+
+        return ServiceTokenResponse.builder()
+                .expireIn(expireIn.getTime() + "")
+                .fromService(request.getFromServiceId().toString())
+                .toService(request.getToServiceId().toString())
+                .token(builder.compact())
                 .build();
     }
 
@@ -198,7 +249,7 @@ public class JwtTokenProvider {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
     }
 
-    public Session createSession(Client client, User user) {
+    public Session createSession(Client client, User user, UUID sessionId) {
         Session session = sessionService.findByClientIdAndUserId(client.getClientId(), user.getUserId());
         if (session == null) {
             session = new Session();
@@ -206,9 +257,17 @@ public class JwtTokenProvider {
             session.setUser(user);
             session.setActiveSession(false);
             session.setOfflineSession(true);
-            session.setSessionId(UUID.randomUUID());
+            session.setSessionId(sessionId);
         }
         session.setActiveSession(true);
         return session;
+    }
+
+    public String resolveToken(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer")) {
+            return token.substring(6).trim();
+        }
+        return null;
     }
 }

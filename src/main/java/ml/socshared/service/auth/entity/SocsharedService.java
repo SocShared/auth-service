@@ -25,23 +25,18 @@ public class SocsharedService extends BaseEntity {
     @Column(name = "service_id", nullable = false)
     private UUID serviceId;
 
+    @GeneratedValue
+    @Column(name = "client_secret", nullable = false, unique = true)
+    private UUID serviceSecret;
+
     @Column(name = "service_name")
     private String serviceName;
 
     @Column(name = "host_url")
     private String hostUrl;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "to_service_from_service",
-            joinColumns = @JoinColumn(name = "to_service_id", referencedColumnName = "service_id"),
-            inverseJoinColumns = @JoinColumn(name = "from_service_id", referencedColumnName = "service_id")
-    )
-    private Set<SocsharedService> toServices;
-
-    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "toServices", fetch = FetchType.LAZY)
-    private Set<SocsharedService> fromServices;
-
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "client_id")
-    private Client client;
+    @JoinColumn(name = "service_token_id")
+    private ServiceToken serviceToken;
+
 }

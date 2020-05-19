@@ -13,12 +13,14 @@ import java.util.UUID;
 
 public interface ClientService {
 
-    ClientResponse add(NewClientRequest request);
-    ClientResponse update(UUID id, NewClientRequest request);
+    ClientResponse add(UUID userId, NewClientRequest request);
+    ClientResponse update(UUID userId, UUID id, NewClientRequest request);
     ClientResponse activation(UUID id);
     ClientResponse deactivation(UUID id);
     ClientResponse deleteById(UUID id);
     ClientResponse findById(UUID id);
+    ClientResponse findByUserIdAndClientId(UUID userId, UUID clientId);
+    Page<ClientModel> findByUserId(UUID userId, Integer page, Integer size);
     ClientResponse addRole(UUID clientId, UUID roleId);
     ClientResponse removeRole(UUID clientId, UUID roleId);
     Page<ClientModel> findAll(Integer page, Integer size);

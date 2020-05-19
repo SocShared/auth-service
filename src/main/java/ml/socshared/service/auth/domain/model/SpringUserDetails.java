@@ -119,10 +119,10 @@ public class SpringUserDetails implements UserDetails {
                 user.getPassword(),
                 user.getEmail(),
                 user.getStatus().equals(Status.ACTIVE),
-                user.getAccountNonExpired(),
+                false,
                 user.getAccountNonLocked(),
-                user.getCredentialsNonExpired(),
-                user.getLastPasswordResetDate(),
+                false,
+                null,
                 mapToGrantedAuthorities(new ArrayList<>(user.getRoles()))
         );
     }

@@ -2,15 +2,15 @@ spring:
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}/${POSTGRES_DB:auth}
     driver-class-name: org.postgresql.Driver
-    username: ${POSTGRES_USER:postgres}
-    password: ${POSTGRES_PASSWORD:postgres}
+    username: ${POSTGRES_USER:admin}
+    password: ${POSTGRES_PASSWORD:admin}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   zipkin:
-    base-url: http://zipkin:9411/
+    base-url: https://zipkin.socshared.ml/
     service:
       name: ${spring.application.name}
   main:

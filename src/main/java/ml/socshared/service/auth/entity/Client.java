@@ -44,8 +44,9 @@ public class Client extends BaseEntity {
     @OneToMany(mappedBy = "client", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private Set<Session> sessions;
 
-    @OneToOne(mappedBy = "client")
-    private SocsharedService service;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    private User user;
 
     public enum AccessType {
         @JsonProperty("confidential")
