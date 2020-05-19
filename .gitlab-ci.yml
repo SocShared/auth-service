@@ -19,7 +19,6 @@ build:
 docker-build:
   stage: docker-build
   script:
-    - docker images -q |xargs docker rmi
     - docker build -t $CI_DOCKER_LOGIN/socshared-auth-service .
 
 docker-push:
