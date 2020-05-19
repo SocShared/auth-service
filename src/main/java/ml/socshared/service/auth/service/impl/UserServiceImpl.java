@@ -1,13 +1,13 @@
 package ml.socshared.service.auth.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ml.socshared.service.auth.client.MailSenderClient;
 import ml.socshared.service.auth.domain.model.UserModel;
-import ml.socshared.service.auth.domain.request.AuthRequest;
-import ml.socshared.service.auth.domain.request.NewUserRequest;
-import ml.socshared.service.auth.domain.request.UpdatePasswordRequest;
-import ml.socshared.service.auth.domain.request.UpdateUserRequest;
+import ml.socshared.service.auth.domain.request.*;
 import ml.socshared.service.auth.domain.response.SuccessResponse;
 import ml.socshared.service.auth.domain.response.UserResponse;
+import ml.socshared.service.auth.entity.GeneratingCode;
 import ml.socshared.service.auth.entity.User;
 import ml.socshared.service.auth.entity.Role;
 import ml.socshared.service.auth.entity.base.Status;
@@ -15,14 +15,18 @@ import ml.socshared.service.auth.exception.impl.EmailIsExistsException;
 import ml.socshared.service.auth.exception.impl.HttpNotFoundException;
 import ml.socshared.service.auth.exception.impl.UsernameAndEmailIsExistsException;
 import ml.socshared.service.auth.exception.impl.UsernameIsExistsException;
+import ml.socshared.service.auth.repository.GeneratingCodeRepository;
 import ml.socshared.service.auth.repository.UserRepository;
 import ml.socshared.service.auth.repository.RoleRepository;
 import ml.socshared.service.auth.service.UserService;
+import ml.socshared.service.auth.util.GeneratorLinks;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -30,15 +34,16 @@ import java.util.regex.Pattern;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+    private final GeneratingCodeRepository generatingCodeRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final MailSenderClient mailSenderClient;
 
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-    }
+    @Value("${main.host}")
+    private String mainHost;
 
     @Override
     public UserResponse add(NewUserRequest request) {
@@ -75,7 +80,26 @@ public class UserServiceImpl implements UserService {
             user.setRoles(roles);
         }
 
-        return new UserResponse(userRepository.save(user));
+        User u = userRepository.save(user);
+
+        String link = GeneratorLinks.build();
+        GeneratingCode code = new GeneratingCode();
+        code.setGeneratingLink(link);
+        code.setUserId(u.getUserId());
+        code.setExpireIn(LocalDateTime.now().plusHours(24));
+        code.setType(GeneratingCode.Type.EMAIL_CONFIRMATION);
+
+        GeneratingCode c = generatingCodeRepository.save(code);
+        mailSenderClient.send(SendMessageRequest.builder()
+                .subject("SocShared - Подтвердите электронную почту")
+                .text("Здравствуйте, " + user.getUsername() + ".\n\nДля того, чтобы воспользоваться всеми услугами сервиса SocShared, " +
+                        "подтвердите, пожалуйста, Вашу электронную почту, перейдя по следующей ссылке, "+mainHost+"account/ " +
+                        c.getGeneratingLink() + ". Срок действия данной ссылки 24 часа.\n\n" + "" +
+                        "С уважением, администрация сервиса SocShared.")
+                .build()
+        );
+
+        return new UserResponse(u);
     }
 
     @Override
@@ -211,5 +235,29 @@ public class UserServiceImpl implements UserService {
         user = userRepository.save(user);
 
         return new UserResponse(user);
+    }
+
+    @Override
+    public SuccessResponse confirmEmail(String generatingLink) {
+        log.info("confirming email");
+
+        GeneratingCode generatingCode = generatingCodeRepository.findById(generatingLink)
+                .orElse(null);
+
+        if (generatingCode != null && generatingCode.getExpireIn().isBefore(LocalDateTime.now())) {
+            User user = userRepository.findById(generatingCode.getUserId()).orElse(null);
+            if (user != null) {
+                user.setEmailVerified(true);
+                generatingCodeRepository.deleteById(generatingLink);
+                userRepository.save(user);
+                return SuccessResponse.builder()
+                        .success(true)
+                        .build();
+            }
+
+        }
+        return SuccessResponse.builder()
+                .success(false)
+                .build();
     }
 }

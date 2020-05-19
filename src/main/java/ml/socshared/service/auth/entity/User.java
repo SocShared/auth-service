@@ -35,7 +35,7 @@ public class User extends BaseEntity {
     @Column(name = "last_name")
     private String lastname;
 
-    @Column(name = "password")
+    @Column(name = "password", length = 500)
     private String password;
 
     @Column(name = "account_non_locked", nullable = false)
@@ -55,7 +55,6 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private Set<Client> clients;
-
 
     public User() {
         this.emailVerified = false;

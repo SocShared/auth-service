@@ -14,6 +14,6 @@ public class ServiceTokenResponse {
     private String token;
     private String toService;
     private String fromService;
-    private String expireIn;
+    private Long expireIn;
 
 }

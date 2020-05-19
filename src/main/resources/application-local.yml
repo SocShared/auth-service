@@ -12,3 +12,10 @@ spring:
       name: ${spring.application.name}
   main:
     allow-bean-definition-overriding: true
+
+feign:
+  url:
+    mail: ${$MAIL_SENDER:https://ms.socshared.ml}
+
+main:
+  host: https://auth.socshared.ml/

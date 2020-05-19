@@ -28,5 +28,6 @@ public interface UserService {
     SuccessResponse checkData(AuthRequest request);
     UserResponse addRole(UUID id, UUID roleId);
     UserResponse removeRole(UUID id, UUID roleId);
+    SuccessResponse confirmEmail(String generatingLink);
 
 }

@@ -52,7 +52,7 @@ public class JwtTokenProvider {
         Session session = createSession(client, user, UUID.fromString(sessionId));
         OAuth2TokenResponse oAuth2TokenResponse = OAuth2TokenResponse.builder()
                 .accessToken(accessToken)
-                .expireIn(claimsAccess.getExpiration().getTime() + "")
+                .expireIn(claimsAccess.getExpiration().getTime())
                 .refreshToken(refreshToken)
                 .sessionId(session.getSessionId().toString())
                 .tokenType("bearer")
@@ -92,7 +92,7 @@ public class JwtTokenProvider {
 
         OAuth2TokenResponse response = OAuth2TokenResponse.builder()
                 .accessToken(accessToken)
-                .expireIn(accessClaims.getBody().getExpiration().getTime()+"")
+                .expireIn(accessClaims.getBody().getExpiration().getTime())
                 .refreshToken(newRefreshToken)
                 .sessionId(session.getSessionId().toString())
                 .tokenType("bearer")
@@ -177,7 +177,7 @@ public class JwtTokenProvider {
 
 
         return ServiceTokenResponse.builder()
-                .expireIn(expireIn.getTime() + "")
+                .expireIn(expireIn.getTime())
                 .fromService(request.getFromServiceId().toString())
                 .toService(request.getToServiceId().toString())
                 .token(builder.compact())

@@ -14,8 +14,9 @@ spring:
   main:
     allow-bean-definition-overriding: true
 
-facebook:
-  redirect:
-    uri: https://socshared.ml/connect/fb
-  adapter:
-    id: fb-adapter-prod
+feign:
+  url:
+    mail: ${$MAIL_SENDER:https://ms.socshared.ml}
+
+main:
+  host: https://auth.socshared.ml/

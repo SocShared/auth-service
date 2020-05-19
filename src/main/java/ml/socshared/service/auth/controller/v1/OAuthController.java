@@ -26,7 +26,6 @@ public class OAuthController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public OAuth2TokenResponse getToken(@Valid @RequestBody OAuthFlowRequest oAuthFlowRequest) {
 
-
         switch (oAuthFlowRequest.getGrantType()) {
             case PASSWORD:
                 return oAuthService.getTokenByUsernameAndPassword(oAuthFlowRequest);

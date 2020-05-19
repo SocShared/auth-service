@@ -26,7 +26,6 @@ public class JwtClaimsBuilder {
         claimsAccess.put("lastname", user.getLastname());
         claimsAccess.put("email", user.getEmail());
         claimsAccess.put("email_verified", user.getEmailVerified());
-        claimsAccess.put("name", user.getFirstname() + " " + user.getLastname());
         claimsAccess.put("account_non_locked", user.getAccountNonLocked());
         claimsAccess.put("is_reset_password", user.getResetPassword());
 
