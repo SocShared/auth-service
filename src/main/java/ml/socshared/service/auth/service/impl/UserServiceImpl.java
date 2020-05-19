@@ -27,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -96,6 +97,7 @@ public class UserServiceImpl implements UserService {
                         "подтвердите, пожалуйста, Вашу электронную почту, перейдя по следующей ссылке, "+mainHost+"account/ " +
                         c.getGeneratingLink() + ". Срок действия данной ссылки 24 часа.\n\n" + "" +
                         "С уважением, администрация сервиса SocShared.")
+                .toEmails(new ArrayList<>() {{add(u.getEmail());}})
                 .build()
         );
 
