@@ -25,7 +25,7 @@ public class RegistrationController {
         return service.add(request);
     }
 
-    @GetMapping(value = "/account/{generatingLink}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/account/email/{generatingLink}", produces = MediaType.APPLICATION_JSON_VALUE)
     public SuccessResponse confirmEmail(@PathVariable String generatingLink) {
         return service.confirmEmail(generatingLink);
     }

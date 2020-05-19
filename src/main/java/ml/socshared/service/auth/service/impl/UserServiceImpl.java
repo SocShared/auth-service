@@ -252,7 +252,8 @@ public class UserServiceImpl implements UserService {
         GeneratingCode generatingCode = generatingCodeRepository.findById(generatingLink)
                 .orElse(null);
 
-        if (generatingCode != null && generatingCode.getExpireIn().isAfter(LocalDateTime.now())) {
+        if (generatingCode != null && generatingCode.getType() == GeneratingCode.Type.EMAIL_CONFIRMATION
+                && generatingCode.getExpireIn().isAfter(LocalDateTime.now())) {
             User user = userRepository.findById(generatingCode.getUserId()).orElse(null);
             if (user != null) {
                 user.setEmailVerified(true);

@@ -5,6 +5,7 @@ import ml.socshared.service.auth.domain.model.UserModel;
 import ml.socshared.service.auth.domain.request.NewUserRequest;
 import ml.socshared.service.auth.domain.request.UpdatePasswordRequest;
 import ml.socshared.service.auth.domain.request.UpdateUserRequest;
+import ml.socshared.service.auth.domain.response.SuccessResponse;
 import ml.socshared.service.auth.domain.response.UserResponse;
 import ml.socshared.service.auth.entity.Role;
 import ml.socshared.service.auth.repository.UserRepository;
@@ -83,4 +84,5 @@ public class UserController {
         UUID userId = jwtTokenProvider.getUserIdByToken(jwtTokenProvider.resolveToken(servletRequest));
         return service.updatePassword(userId, request);
     }
+
 }
