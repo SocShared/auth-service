@@ -4,6 +4,7 @@ package ml.socshared.service.auth.config;
 import com.google.common.hash.Hashing;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ml.socshared.service.auth.entity.Client;
 import ml.socshared.service.auth.entity.Role;
 import ml.socshared.service.auth.entity.User;
 import ml.socshared.service.auth.entity.base.Status;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Component
@@ -44,11 +46,13 @@ public class InitDatabase implements InitializingBean {
         } catch (Exception ignore) {}
         try {
             Role admin = roleRepository.findByName("ADMIN").orElseThrow(() -> new HttpNotFoundException("Not found role with name ADMIN"));
+            Role contentManager = roleRepository.findByName("CONTENT_MANAGER").orElseThrow(() -> new HttpNotFoundException("Not found role with name CONTENT_MANAGER"));
             User user = new User();
             user.setUsername("admin");
             user.setEmail("admin@socshared.local");
             Set<Role> set = new HashSet<>();
             set.add(admin);
+            set.add(contentManager);
             user.setRoles(set);
             user.setPassword(Hashing.sha256().hashString("admin", StandardCharsets.UTF_8).toString());
             user.setStatus(Status.ACTIVE);
@@ -57,6 +61,19 @@ public class InitDatabase implements InitializingBean {
             user.setResetPassword(false);
             userRepository.save(user);
             log.info("HIBERNATE init user admin");
+        } catch (Exception ignore) {}
+        try {
+            Role admin = roleRepository.findByName("ADMIN").orElseThrow(() -> new HttpNotFoundException("Not found role with name ADMIN"));
+            Role contentManager = roleRepository.findByName("CONTENT_MANAGER").orElseThrow(() -> new HttpNotFoundException("Not found role with name CONTENT_MANAGER"));
+            Client client = new Client();
+            client.setUser(null);
+            client.setClientId(UUID.fromString("360dad92-ecb1-44e7-990a-3152d2642919"));
+            client.setClientSecret(UUID.fromString("cb456410-85ca-43b5-9a12-87171ad84516"));
+            client.setAccessType(Client.AccessType.PUBLIC);
+            client.setRoles(new HashSet<>() {{add(admin); add(contentManager);}});
+            client.setValidRedirectUri("/");
+            client.setName("frontend-service");
+            log.info("HIBERNATE init client frontend-service");
         } catch (Exception ignore) {}
     }
 
