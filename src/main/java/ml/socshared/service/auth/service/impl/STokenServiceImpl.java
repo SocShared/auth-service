@@ -36,7 +36,9 @@ public class STokenServiceImpl implements STokenService {
     public SuccessResponse checkValidateToken(CheckTokenRequest request) {
         log.info("checking data service to");
 
-        return SuccessResponse.builder().success(jwtTokenProvider.validateServiceToken(request))
-                .build();
+        SuccessResponse successResponse = new SuccessResponse();
+        successResponse.setSuccess(jwtTokenProvider.validateServiceToken(request));
+
+        return successResponse;
     }
 }

@@ -114,7 +114,10 @@ public class ClientServiceImpl implements ClientService {
         log.info("checking c and password");
         Client client = clientRepository.findByClientIdAndClientSecret(request.getClientId(), request.getClientSecret()).orElse(null);
 
-        return SuccessResponse.builder().success(client != null).build();
+        SuccessResponse successResponse = new SuccessResponse();
+        successResponse.setSuccess(client != null);
+
+        return successResponse;
     }
 
     @Override

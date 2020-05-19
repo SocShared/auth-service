@@ -93,9 +93,9 @@ public class UserServiceImpl implements UserService {
         GeneratingCode c = generatingCodeRepository.save(code);
         mailSenderClient.send(SendMessageRequest.builder()
                 .subject("SocShared - Подтвердите электронную почту")
-                .text("Здравствуйте, " + user.getUsername() + ".\n\nДля того, чтобы воспользоваться всеми услугами сервиса SocShared, " +
-                        "подтвердите, пожалуйста, Вашу электронную почту, перейдя по следующей ссылке, "+mainHost+"account/ " +
-                        c.getGeneratingLink() + ". Срок действия данной ссылки 24 часа.\n\n" + "" +
+                .text("Здравствуйте, " + user.getUsername() + ".<br><br>Для того, чтобы воспользоваться всеми услугами сервиса SocShared, " +
+                        "подтвердите, пожалуйста, Вашу электронную почту, перейдя по следующей ссылке, <a href=\""+mainHost+"account/" +
+                        c.getGeneratingLink() + "\">Подтвердить почту</a>. Срок действия данной ссылки 24 часа.<br><br>" + "" +
                         "С уважением, администрация сервиса SocShared.")
                 .toEmails(new ArrayList<>() {{add(u.getEmail());}})
                 .build()
@@ -151,7 +151,10 @@ public class UserServiceImpl implements UserService {
             user.setUsername(user.getUsername() + "\\" + user.getUserId());
             user = userRepository.save(user);
         }
-        return SuccessResponse.builder().success(true).build();
+        SuccessResponse successResponse = new SuccessResponse();
+        successResponse.setSuccess(true);
+
+        return successResponse;
     }
 
     @Override
@@ -208,7 +211,10 @@ public class UserServiceImpl implements UserService {
         } else {
             user = userRepository.findByUsernameAndPassword(request.getUsername(), request.getPassword()).orElse(null);
         }
-        return SuccessResponse.builder().success(user != null).build();
+        SuccessResponse successResponse = new SuccessResponse();
+        successResponse.setSuccess(user != null);
+
+        return successResponse;
     }
 
     @Override
@@ -246,20 +252,22 @@ public class UserServiceImpl implements UserService {
         GeneratingCode generatingCode = generatingCodeRepository.findById(generatingLink)
                 .orElse(null);
 
-        if (generatingCode != null && generatingCode.getExpireIn().isBefore(LocalDateTime.now())) {
+        if (generatingCode != null && generatingCode.getExpireIn().isAfter(LocalDateTime.now())) {
             User user = userRepository.findById(generatingCode.getUserId()).orElse(null);
             if (user != null) {
                 user.setEmailVerified(true);
                 generatingCodeRepository.deleteById(generatingLink);
                 userRepository.save(user);
-                return SuccessResponse.builder()
-                        .success(true)
-                        .build();
+                SuccessResponse successResponse = new SuccessResponse();
+                successResponse.setSuccess(true);
+
+                return successResponse;
             }
 
         }
-        return SuccessResponse.builder()
-                .success(false)
-                .build();
+        SuccessResponse successResponse = new SuccessResponse();
+        successResponse.setSuccess(false);
+
+        return successResponse;
     }
 }
