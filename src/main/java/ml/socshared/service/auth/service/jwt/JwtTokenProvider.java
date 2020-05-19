@@ -4,12 +4,14 @@ import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ml.socshared.service.auth.domain.model.SpringUserDetails;
+import ml.socshared.service.auth.domain.request.CheckTokenRequest;
 import ml.socshared.service.auth.domain.request.ServiceTokenRequest;
 import ml.socshared.service.auth.domain.response.OAuth2TokenResponse;
 import ml.socshared.service.auth.domain.response.ServiceTokenResponse;
 import ml.socshared.service.auth.domain.response.UserResponse;
 import ml.socshared.service.auth.entity.*;
 import ml.socshared.service.auth.exception.impl.AuthenticationException;
+import ml.socshared.service.auth.repository.SocsharedServiceRepository;
 import ml.socshared.service.auth.service.OAuthService;
 import ml.socshared.service.auth.service.SessionService;
 import ml.socshared.service.auth.service.UserService;
@@ -37,6 +39,7 @@ public class JwtTokenProvider {
     private final AuthenticationUserService authenticationUserService;
     private final UserService userService;
     private final SessionService sessionService;
+    private final SocsharedServiceRepository socsharedServiceRepository;
 
     public OAuth2TokenResponse createTokenByUsernameAndPassword(User user, Client client) {
         Claims claimsAccess = JwtClaimsBuilder.buildJwtClaimsByUsernameAndPassword(user, client);
@@ -220,6 +223,34 @@ public class JwtTokenProvider {
                 return false;
             }
             return true;
+        } catch (JwtException | IllegalArgumentException exc) {
+            if (exc instanceof ExpiredJwtException) {
+                log.warn("JWT Token is expired.");
+            } else {
+                log.warn("JWT Token is invalid.");
+            }
+            return false;
+        }
+    }
+
+    public boolean validateServiceToken(CheckTokenRequest request) {
+        try {
+            Jws<Claims> claims = getJwsClaimsFromToken(request.getToken());
+            boolean toServiceIdIsTrue = request.getToServiceId().equals(UUID.fromString(claims.getBody().get("to_service", String.class)));
+            boolean fromServiceIdIsTrue = request.getFromServiceId().equals(UUID.fromString(claims.getBody().get("from_service", String.class)));
+            if (!toServiceIdIsTrue || !fromServiceIdIsTrue)
+                return false;
+
+            Date date = claims.getBody().getExpiration();
+            if (date.before(new Date())) {
+                log.warn("JWT Token is expired.");
+                return false;
+            }
+
+            boolean isPresentToServiceId = socsharedServiceRepository.existsById(request.getToServiceId());
+            boolean isPresentFromServiceId = socsharedServiceRepository.existsById(request.getFromServiceId());
+
+            return isPresentToServiceId && isPresentFromServiceId;
         } catch (JwtException | IllegalArgumentException exc) {
             if (exc instanceof ExpiredJwtException) {
                 log.warn("JWT Token is expired.");

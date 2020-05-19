@@ -1,8 +1,10 @@
 package ml.socshared.service.auth.controller.v1;
 
 import lombok.RequiredArgsConstructor;
+import ml.socshared.service.auth.domain.request.CheckTokenRequest;
 import ml.socshared.service.auth.domain.request.ServiceTokenRequest;
 import ml.socshared.service.auth.domain.response.ServiceTokenResponse;
+import ml.socshared.service.auth.domain.response.SuccessResponse;
 import ml.socshared.service.auth.service.STokenService;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -22,8 +24,13 @@ public class ServiceAccessController {
     private final STokenService service;
 
     @PostMapping(value = "/service/token", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    private ServiceTokenResponse getServiceToken(@Valid ServiceTokenRequest request) {
+    public ServiceTokenResponse getServiceToken(@Valid ServiceTokenRequest request) {
         return service.getToken(request);
+    }
+
+    @PostMapping(value = "/service/{service_id}/validate_token", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public SuccessResponse checkValidateToken(@Valid CheckTokenRequest request) {
+        return service.checkValidateToken(request);
     }
 
 }
