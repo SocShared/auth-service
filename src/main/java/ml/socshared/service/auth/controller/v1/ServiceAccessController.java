@@ -9,10 +9,7 @@ import ml.socshared.service.auth.entity.SocsharedService;
 import ml.socshared.service.auth.service.STokenService;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -25,12 +22,12 @@ public class ServiceAccessController {
     private final STokenService service;
 
     @PostMapping(value = "/public/service/token", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ServiceTokenResponse getServiceToken(@Valid ServiceTokenRequest request) {
+    public ServiceTokenResponse getServiceToken(@Valid @RequestBody ServiceTokenRequest request) {
         return service.getToken(request);
     }
 
     @PostMapping(value = "/public/service/validate_token", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public SuccessResponse checkValidateToken(@Valid CheckTokenRequest request) {
+    public SuccessResponse checkValidateToken(@Valid @RequestBody CheckTokenRequest request) {
         return service.checkValidateToken(request);
     }
 

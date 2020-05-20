@@ -14,6 +14,5 @@ public class ServiceTokenRequest {
     private UUID fromServiceId;
     private UUID toServiceId;
     private UUID toSecretService;
-    private String usersAccessToken;
 
 }

@@ -21,7 +21,6 @@ import java.util.UUID;
 public class SocsharedService extends BaseEntity {
 
     @Id
-    @GeneratedValue
     @Column(name = "service_id", nullable = false)
     private UUID serviceId;
 
@@ -35,8 +34,7 @@ public class SocsharedService extends BaseEntity {
     @Column(name = "host_url")
     private String hostUrl;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "service_token_id")
-    private ServiceToken serviceToken;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "fromService")
+    private Set<ServiceToken> serviceTokens;
 
 }

@@ -26,12 +26,13 @@ public class ServiceToken extends BaseEntity {
     private String token;
 
     @Column(name = "token_expire_in", nullable = false)
-    private String tokenExpireIn;
+    private Long tokenExpireIn;
 
     @Column(name = "to_service_id", nullable = false)
     private UUID toServiceId;
 
-    @OneToOne(mappedBy = "serviceToken")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "from_service_id", referencedColumnName = "service_id")
     private SocsharedService fromService;
 
 }

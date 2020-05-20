@@ -154,31 +154,6 @@ public class JwtTokenProvider {
         claimsAccess.put("from_service", request.getFromServiceId().toString());
         claimsAccess.put("to_service", request.getToServiceId().toString());
 
-        if (request.getUsersAccessToken() != null) {
-            Claims claimsFromUserToken = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(request.getUsersAccessToken()).getBody();
-            String userId = claimsFromUserToken.getSubject();
-            claimsAccess.put("user_id", userId);
-            String sessionId = claimsFromUserToken.get("session_state", String.class);
-            claimsAccess.put("session_state", sessionId);
-            ArrayList<String> roles = claimsFromUserToken.get("roles", ArrayList.class);
-            roles.add("SERVICE");
-            claimsAccess.put("roles", roles);
-            String username = claimsFromUserToken.get("username", String.class);
-            claimsAccess.put("username", username);
-            String firstname = claimsFromUserToken.get("firstname", String.class);
-            claimsAccess.put("firstname", firstname);
-            String lastname = claimsFromUserToken.get("lastname", String.class);
-            claimsAccess.put("lastname", lastname);
-            String email = claimsFromUserToken.get("email", String.class);
-            claimsAccess.put("email", email);
-            Boolean emailVerified = claimsFromUserToken.get("email_verified", Boolean.class);
-            claimsAccess.put("email_verified", emailVerified);
-            Boolean accountNonLocked = claimsFromUserToken.get("account_non_locked", Boolean.class);
-            claimsAccess.put("account_non_locked", accountNonLocked);
-            Boolean isResetPassword = claimsFromUserToken.get("is_reset_password", Boolean.class);
-            claimsAccess.put("is_reset_password", isResetPassword);
-        }
-
         Date now = new Date();
         Date expireIn = new Date(now.getTime() + 1000 * 60 * 30);
         JwtBuilder builder = Jwts.builder()
@@ -186,7 +161,6 @@ public class JwtTokenProvider {
                 .setIssuedAt(now)
                 .setExpiration(expireIn)
                 .signWith(SignatureAlgorithm.HS512, secretKey);
-
 
         return ServiceTokenResponse.builder()
                 .expireIn(expireIn.getTime())

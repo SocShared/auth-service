@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ml.socshared.service.auth.entity.Client;
 import ml.socshared.service.auth.entity.Role;
+import ml.socshared.service.auth.entity.SocsharedService;
 import ml.socshared.service.auth.entity.User;
 import ml.socshared.service.auth.entity.base.Status;
 import ml.socshared.service.auth.exception.impl.HttpNotFoundException;
@@ -76,9 +77,26 @@ public class InitDatabase implements InitializingBean {
             client.setName("frontend-service");
             clientRepository.save(client);
             log.info("HIBERNATE init client frontend-service");
-        } catch (Exception ignore) {
-            ignore.printStackTrace();
-        }
+        } catch (Exception ignore) { }
+        try {
+            SocsharedService socsharedService = new SocsharedService();
+            socsharedService.setHostUrl("http://fb_service_adapter");
+            socsharedService.setServiceId(UUID.fromString("f7e14d85-415c-4ab9-b285-a6481d79f507"));
+            socsharedService.setServiceName("FB Service Adapter");
+            socsharedService.setServiceSecret(UUID.fromString("427d82bb-b367-40b4-bee8-b18e32480899"));
+            socsharedServiceRepository.save(socsharedService);
+            log.info("HIBERNATE init service FB Service Adapter");
+        } catch (Exception ignore) {}
+        try {
+            SocsharedService socsharedService = new SocsharedService();
+            socsharedService.setHostUrl("http://fb_service_adapter");
+            socsharedService.setServiceId(UUID.fromString("f7e14d85-415c-4ab9-b285-a6481d79f507"));
+            socsharedService.setServiceName("FB Service Adapter");
+            socsharedService.setServiceSecret(UUID.fromString("427d82bb-b367-40b4-bee8-b18e32480899"));
+            socsharedServiceRepository.save(socsharedService);
+            log.info("HIBERNATE init service FB Service Adapter");
+        } catch (Exception ignore) {}
+
     }
 
 }

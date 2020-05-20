@@ -6,13 +6,17 @@ import ml.socshared.service.auth.domain.request.CheckTokenRequest;
 import ml.socshared.service.auth.domain.request.ServiceTokenRequest;
 import ml.socshared.service.auth.domain.response.ServiceTokenResponse;
 import ml.socshared.service.auth.domain.response.SuccessResponse;
+import ml.socshared.service.auth.entity.ServiceToken;
 import ml.socshared.service.auth.entity.SocsharedService;
 import ml.socshared.service.auth.exception.impl.HttpNotFoundException;
+import ml.socshared.service.auth.repository.ServiceTokenRepository;
 import ml.socshared.service.auth.repository.SocsharedServiceRepository;
 import ml.socshared.service.auth.service.STokenService;
 import ml.socshared.service.auth.service.jwt.JwtTokenProvider;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -21,6 +25,7 @@ public class STokenServiceImpl implements STokenService {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final SocsharedServiceRepository serviceRepository;
+    private final ServiceTokenRepository serviceTokenRepository;
 
     @Override
     public ServiceTokenResponse getToken(ServiceTokenRequest request) {
@@ -29,7 +34,19 @@ public class STokenServiceImpl implements STokenService {
         serviceRepository.findByServiceIdAndServiceSecret(request.getToServiceId(), request.getToSecretService())
                 .orElseThrow(() -> new HttpNotFoundException("Not found service by service id and secret service"));
 
-        return jwtTokenProvider.buildServiceToken(request);
+        SocsharedService service = serviceRepository.findById(request.getFromServiceId())
+                .orElseThrow(() -> new HttpNotFoundException("Not found service by service id"));
+
+        ServiceTokenResponse serviceTokenResponse = jwtTokenProvider.buildServiceToken(request);
+        ServiceToken serviceToken = new ServiceToken();
+        serviceToken.setFromService(service);
+        serviceToken.setToken(serviceTokenResponse.getToken());
+        serviceToken.setTokenExpireIn(serviceTokenResponse.getExpireIn());
+        serviceToken.setToServiceId(request.getToServiceId());
+
+        serviceTokenRepository.save(serviceToken);
+
+        return serviceTokenResponse;
     }
 
     @Override
