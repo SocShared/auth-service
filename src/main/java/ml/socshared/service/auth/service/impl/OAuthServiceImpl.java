@@ -1,5 +1,6 @@
 package ml.socshared.service.auth.service.impl;
 
+import com.google.common.hash.Hashing;
 import jdk.jfr.Registered;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ import ml.socshared.service.auth.service.UserService;
 import ml.socshared.service.auth.service.jwt.JwtTokenProvider;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 @Service
@@ -47,7 +49,7 @@ public class OAuthServiceImpl implements OAuthService {
 
         AuthRequest authRequest = new AuthRequest();
         authRequest.setUsername(request.getUsername());
-        authRequest.setPassword(request.getPassword());
+        authRequest.setPassword(Hashing.sha256().hashString(request.getPassword(), StandardCharsets.UTF_8).toString());
 
         ClientCredentialsRequest clientCredentialsRequest = ClientCredentialsRequest.builder()
                 .clientId(request.getClientId())

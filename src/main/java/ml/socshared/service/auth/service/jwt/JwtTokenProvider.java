@@ -11,6 +11,7 @@ import ml.socshared.service.auth.domain.response.ServiceTokenResponse;
 import ml.socshared.service.auth.domain.response.UserResponse;
 import ml.socshared.service.auth.entity.*;
 import ml.socshared.service.auth.exception.impl.AuthenticationException;
+import ml.socshared.service.auth.repository.ServiceTokenRepository;
 import ml.socshared.service.auth.repository.SocsharedServiceRepository;
 import ml.socshared.service.auth.service.OAuthService;
 import ml.socshared.service.auth.service.SessionService;
@@ -40,14 +41,17 @@ public class JwtTokenProvider {
     private final UserService userService;
     private final SessionService sessionService;
     private final SocsharedServiceRepository socsharedServiceRepository;
+    private final ServiceTokenRepository serviceTokenRepository;
 
     public OAuth2TokenResponse createTokenByUsernameAndPassword(User user, Client client) {
         Claims claimsAccess = JwtClaimsBuilder.buildJwtClaimsByUsernameAndPassword(user, client);
         String accessToken = generationToken(claimsAccess, validityAccessTokenInMilliseconds);
-        Claims claimsRefresh = Jwts.claims().setSubject(user.getUserId().toString());
-        String refreshToken = generationToken(claimsRefresh, validityRefreshTokenInMilliseconds);
 
         String sessionId = claimsAccess.get("session_state", String.class);
+        Claims claimsRefresh = Jwts.claims().setSubject(user.getUserId().toString());
+        claimsRefresh.put("client_id", client.getClientId().toString());
+        claimsRefresh.put("session_state", sessionId);
+        String refreshToken = generationToken(claimsRefresh, validityRefreshTokenInMilliseconds);
 
         Session session = createSession(client, user, UUID.fromString(sessionId));
         OAuth2TokenResponse oAuth2TokenResponse = OAuth2TokenResponse.builder()
@@ -59,15 +63,19 @@ public class JwtTokenProvider {
                 .build();
 
         OAuth2AccessToken aToken = new OAuth2AccessToken();
+        if (session.getAccessToken() != null)
+            aToken.setTokenId(session.getAccessToken().getTokenId());
         aToken.setAccessToken(accessToken);
-        aToken.setExpireIn(claimsAccess.getExpiration().getTime() + "");
+        aToken.setExpireIn(claimsAccess.getExpiration().getTime());
         aToken.setSession(session);
         aToken.setTokenType("bearer");
         session.setAccessToken(aToken);
         session.setOfflineSession(false);
 
         OAuth2RefreshToken rToken = new OAuth2RefreshToken();
-        rToken.setRefreshExpiresIn(claimsRefresh.getExpiration().getTime() + "");
+        if (session.getRefreshToken() != null)
+            rToken.setRefreshTokenId(session.getRefreshToken().getRefreshTokenId());
+        rToken.setRefreshExpiresIn(claimsRefresh.getExpiration().getTime());
         rToken.setRefreshToken(refreshToken);
         session.setRefreshToken(rToken);
         session.setActiveSession(true);
@@ -99,16 +107,20 @@ public class JwtTokenProvider {
                 .build();
 
         OAuth2AccessToken aToken = new OAuth2AccessToken();
+        if (session.getAccessToken() != null)
+            aToken.setTokenId(session.getAccessToken().getTokenId());
         aToken.setAccessToken(accessToken);
-        aToken.setExpireIn(accessClaims.getBody().getExpiration().getTime() + "");
+        aToken.setExpireIn(accessClaims.getBody().getExpiration().getTime());
         aToken.setSession(session);
         aToken.setTokenType("bearer");
         session.setAccessToken(aToken);
         session.setOfflineSession(false);
 
         OAuth2RefreshToken rToken = new OAuth2RefreshToken();
-        rToken.setRefreshExpiresIn(claimsRefresh.getExpiration().getTime() + "");
-        rToken.setRefreshToken(refreshToken);
+        if (session.getRefreshToken() != null)
+            rToken.setRefreshTokenId(session.getRefreshToken().getRefreshTokenId());
+        rToken.setRefreshExpiresIn(claimsRefresh.getExpiration().getTime());
+        rToken.setRefreshToken(newRefreshToken);
         session.setRefreshToken(rToken);
         session.setActiveSession(true);
 
@@ -190,14 +202,17 @@ public class JwtTokenProvider {
             UUID userId = UUID.fromString(claims.getBody().getSubject());
             UUID clientId = UUID.fromString(claims.getBody().get("client_id", String.class));
             Date date = claims.getBody().getExpiration();
-            if (date.before(new Date())) {
+            UUID sessionState = UUID.fromString(claims.getBody().get("session_state", String.class));
+            Session session = sessionService.findById(sessionState);
+            if (date.before(new Date()) && session.getUser().getUserId().equals(userId)
+                    && session.getClient().getClientId().equals(clientId)) {
                 log.warn("JWT Token is expired.");
-                Session session = sessionService.findByClientIdAndUserId(userId, clientId);
                 session.setActiveSession(false);
                 sessionService.save(session);
                 return false;
             }
-            return true;
+            return session != null && session.getAccessToken() != null &&
+                    session.getAccessToken().getAccessToken().equals(token);
         } catch (JwtException | IllegalArgumentException exc) {
             if (exc instanceof ExpiredJwtException) {
                 log.warn("JWT Token is expired.");
@@ -214,15 +229,18 @@ public class JwtTokenProvider {
             UUID userId = UUID.fromString(claims.getBody().getSubject());
             UUID clientId = UUID.fromString(claims.getBody().get("client_id", String.class));
             Date date = claims.getBody().getExpiration();
-            if (date.before(new Date())) {
+            UUID sessionState = UUID.fromString(claims.getBody().get("session_state", String.class));
+            Session session = sessionService.findById(sessionState);
+            if (date.before(new Date()) && session.getUser().getUserId().equals(userId)
+                    && session.getClient().getClientId().equals(clientId)) {
                 log.warn("JWT Token is expired.");
-                Session session = sessionService.findByClientIdAndUserId(userId, clientId);
                 session.setActiveSession(false);
                 session.setOfflineSession(true);
                 sessionService.save(session);
                 return false;
             }
-            return true;
+            return session != null && session.getRefreshToken() != null &&
+                    session.getRefreshToken().getRefreshToken().equals(token);
         } catch (JwtException | IllegalArgumentException exc) {
             if (exc instanceof ExpiredJwtException) {
                 log.warn("JWT Token is expired.");
@@ -250,7 +268,9 @@ public class JwtTokenProvider {
             boolean isPresentToServiceId = socsharedServiceRepository.existsById(request.getToServiceId());
             boolean isPresentFromServiceId = socsharedServiceRepository.existsById(request.getFromServiceId());
 
-            return isPresentToServiceId && isPresentFromServiceId;
+            return isPresentToServiceId && isPresentFromServiceId &&
+                    serviceTokenRepository.findByToServiceIdAndFromServiceId(request.getToServiceId(),
+                            request.getFromServiceId()).orElse(null) != null;
         } catch (JwtException | IllegalArgumentException exc) {
             if (exc instanceof ExpiredJwtException) {
                 log.warn("JWT Token is expired.");

@@ -1,5 +1,6 @@
 package ml.socshared.service.auth.service.impl;
 
+import com.google.common.hash.Hashing;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ml.socshared.service.auth.client.MailSenderClient;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -72,7 +74,7 @@ public class UserServiceImpl implements UserService {
         user.setEmail(request.getEmail());
         user.setFirstname(request.getFirstname());
         user.setLastname(request.getLastname());
-        user.setPassword(request.getPassword());
+        user.setPassword(Hashing.sha256().hashString(request.getPassword(), StandardCharsets.UTF_8).toString());
 
         Role role = roleRepository.findByName("CONTENT_MANAGER").orElse(null);
         if (role != null) {

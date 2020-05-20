@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import ml.socshared.service.auth.entity.base.BaseEntity;
+import ml.socshared.service.auth.entity.base.Status;
 
 import javax.persistence.*;
 import java.util.List;
@@ -34,4 +35,8 @@ public class Role extends BaseEntity {
     @JsonBackReference
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     private List<Client> clients;
+
+    public Role() {
+        this.setStatus(Status.ACTIVE);
+    }
 }

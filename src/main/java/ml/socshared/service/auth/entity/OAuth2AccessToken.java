@@ -26,7 +26,7 @@ public class OAuth2AccessToken extends BaseEntity {
     private String accessToken;
 
     @Column(name = "expire_in", nullable = false)
-    private String expireIn;
+    private Long expireIn;
 
     @Column(name = "token_type", nullable = false)
     private String tokenType;
@@ -35,5 +35,6 @@ public class OAuth2AccessToken extends BaseEntity {
     private String scope;
 
     @OneToOne(mappedBy = "accessToken")
+    @JoinColumn(name = "session_id", referencedColumnName = "session_id")
     private Session session;
 }

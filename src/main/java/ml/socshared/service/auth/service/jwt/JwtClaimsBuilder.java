@@ -19,7 +19,7 @@ public class JwtClaimsBuilder {
         claimsAccess.put("session_state", UUID.randomUUID().toString());
         claimsAccess.put("typ", "bearer");
         claimsAccess.put("roles", user.getRoleNames());
-        claimsAccess.put("client_id", client.getClientId());
+        claimsAccess.put("client_id", client.getClientId().toString());
         claimsAccess.put("client_name", client.getName());
         claimsAccess.put("username", user.getUsername());
         claimsAccess.put("firstname", user.getFirstname());

@@ -24,6 +24,12 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
+    public Session findById(UUID id) {
+        log.info("find by id -> {}", id);
+        return sessionRepository.findById(id).orElse(null);
+    }
+
+    @Override
     public Session save(Session session) {
         log.info("saving session -> {}", session.getSessionId());
         return sessionRepository.save(session);
@@ -34,4 +40,6 @@ public class SessionServiceImpl implements SessionService {
         log.info("deleting session -> {}", sessionId);
         sessionRepository.deleteById(sessionId);
     }
+
+
 }

@@ -2,6 +2,7 @@ package ml.socshared.service.auth.entity;
 
 import lombok.*;
 import ml.socshared.service.auth.entity.base.BaseEntity;
+import ml.socshared.service.auth.entity.base.Status;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -60,6 +61,7 @@ public class User extends BaseEntity {
         this.emailVerified = false;
         this.accountNonLocked = true;
         this.resetPassword = false;
+        this.setStatus(Status.ACTIVE);
     }
 
     public List<String> getRoleNames() {

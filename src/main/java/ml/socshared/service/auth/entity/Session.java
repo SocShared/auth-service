@@ -37,11 +37,9 @@ public class Session extends BaseEntity {
     private User user;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "access_token_id")
     private OAuth2AccessToken accessToken;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "refresh_token_id")
     private OAuth2RefreshToken refreshToken;
 
 }

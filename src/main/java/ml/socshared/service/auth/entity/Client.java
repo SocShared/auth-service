@@ -3,6 +3,7 @@ package ml.socshared.service.auth.entity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import ml.socshared.service.auth.entity.base.BaseEntity;
+import ml.socshared.service.auth.entity.base.Status;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -17,7 +18,6 @@ import java.util.UUID;
 public class Client extends BaseEntity {
 
     @Id
-    @GeneratedValue
     @Column(name = "client_id", nullable = false, unique = true)
     private UUID clientId;
 
@@ -47,6 +47,11 @@ public class Client extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user;
+
+    public Client() {
+        this.clientId = UUID.randomUUID();
+        this.setStatus(Status.ACTIVE);
+    }
 
     public enum AccessType {
         @JsonProperty("confidential")

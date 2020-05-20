@@ -26,8 +26,9 @@ public class OAuth2RefreshToken extends BaseEntity {
     private String refreshToken;
 
     @Column(name = "refresh_expires_in", nullable = false)
-    private String refreshExpiresIn;
+    private Long refreshExpiresIn;
 
     @OneToOne(mappedBy = "refreshToken")
+    @JoinColumn(name = "session_id", referencedColumnName = "session_id")
     private Session session;
 }

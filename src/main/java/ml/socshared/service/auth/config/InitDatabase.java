@@ -9,6 +9,7 @@ import ml.socshared.service.auth.entity.Role;
 import ml.socshared.service.auth.entity.User;
 import ml.socshared.service.auth.entity.base.Status;
 import ml.socshared.service.auth.exception.impl.HttpNotFoundException;
+import ml.socshared.service.auth.repository.ClientRepository;
 import ml.socshared.service.auth.repository.RoleRepository;
 import ml.socshared.service.auth.repository.SocsharedServiceRepository;
 import ml.socshared.service.auth.repository.UserRepository;
@@ -28,6 +29,7 @@ public class InitDatabase implements InitializingBean {
 
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
+    private final ClientRepository clientRepository;
     private final SocsharedServiceRepository socsharedServiceRepository;
 
     @Override
@@ -55,7 +57,6 @@ public class InitDatabase implements InitializingBean {
             set.add(contentManager);
             user.setRoles(set);
             user.setPassword(Hashing.sha256().hashString("admin", StandardCharsets.UTF_8).toString());
-            user.setStatus(Status.ACTIVE);
             user.setEmailVerified(true);
             user.setAccountNonLocked(true);
             user.setResetPassword(false);
@@ -73,8 +74,11 @@ public class InitDatabase implements InitializingBean {
             client.setRoles(new HashSet<>() {{add(admin); add(contentManager);}});
             client.setValidRedirectUri("/");
             client.setName("frontend-service");
+            clientRepository.save(client);
             log.info("HIBERNATE init client frontend-service");
-        } catch (Exception ignore) {}
+        } catch (Exception ignore) {
+            ignore.printStackTrace();
+        }
     }
 
 }
