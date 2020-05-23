@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import ml.socshared.auth.client.MailSenderClient;
 import ml.socshared.auth.domain.model.UserModel;
 import ml.socshared.auth.domain.request.*;
-import ml.socshared.service.auth.domain.request.*;
+import ml.socshared.auth.domain.request.*;
 import ml.socshared.auth.domain.response.SuccessResponse;
 import ml.socshared.auth.domain.response.UserResponse;
 import ml.socshared.auth.entity.GeneratingCode;

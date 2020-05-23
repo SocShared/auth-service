@@ -13,7 +13,7 @@ import ml.socshared.auth.repository.ServiceTokenRepository;
 import ml.socshared.auth.service.SessionService;
 import ml.socshared.auth.service.UserService;
 import ml.socshared.auth.domain.response.OAuth2TokenResponse;
-import ml.socshared.service.auth.entity.*;
+import ml.socshared.auth.entity.*;
 import ml.socshared.auth.repository.SocsharedServiceRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

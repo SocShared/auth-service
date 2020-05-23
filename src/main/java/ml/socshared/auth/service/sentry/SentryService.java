@@ -1,9 +1,11 @@
 package ml.socshared.auth.service.sentry;
 
 import io.sentry.Sentry;
-import io.sentry.event.*;
+import io.sentry.event.Breadcrumb;
+import io.sentry.event.Event;
+import io.sentry.event.UserBuilder;
+import ml.socshared.auth.entity.User;
 import org.springframework.stereotype.Service;
-import ru.gfn.subscription.config.security.UserProfile;
 
 import java.util.Map;
 
@@ -14,11 +16,11 @@ public class SentryService {
         Sentry.init();
     }
 
-    public void setUser(UserProfile userProfile) {
+    public void setUser(User user) {
         Sentry.getContext().setUser(new UserBuilder()
-                .setEmail(userProfile.getEmail())
-                .setId(userProfile.getId())
-                .setUsername(userProfile.getFirstName() + " " + userProfile.getLastName())
+                .setEmail(user.getEmail())
+                .setId(user.getUserId().toString())
+                .setUsername(user.getFirstname() + " " + user.getLastname())
                 .build());
     }
 
@@ -37,7 +39,10 @@ public class SentryService {
 
     public void logException(Throwable exc, User affectedUser, Breadcrumb breadcrumb) {
         if (affectedUser != null) {
-            Sentry.getContext().setUser(affectedUser);
+            Sentry.getContext().setUser(new UserBuilder()
+                    .setEmail(affectedUser.getEmail())
+                    .setId(affectedUser.getUserId().toString())
+                    .setUsername(affectedUser.getFirstname() + " " + affectedUser.getLastname()).build());
         }
 
         if (breadcrumb != null) {
@@ -73,7 +78,10 @@ public class SentryService {
     }
 
     public void logMessage(String message, User affectedUser, Breadcrumb breadcrumb) {
-        Sentry.getContext().setUser(affectedUser);
+        Sentry.getContext().setUser(new UserBuilder()
+                .setEmail(affectedUser.getEmail())
+                .setId(affectedUser.getUserId().toString())
+                .setUsername(affectedUser.getFirstname() + " " + affectedUser.getLastname()).build());
         Sentry.getContext().recordBreadcrumb(breadcrumb);
 
         logMessage(message);
