@@ -11,8 +11,6 @@ import java.util.UUID;
 @ToString
 public class CheckTokenRequest {
 
-    private UUID fromServiceId;
-    private UUID toServiceId;
     private String token;
 
 }

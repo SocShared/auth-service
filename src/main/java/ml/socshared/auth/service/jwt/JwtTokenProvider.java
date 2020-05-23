@@ -36,7 +36,6 @@ public class JwtTokenProvider {
     @Value("${jwt.refresh_token.expired}")
     private long validityRefreshTokenInMilliseconds;
 
-    private final AuthenticationUserService authenticationUserService;
     private final UserService userService;
     private final SessionService sessionService;
     private final SocsharedServiceRepository socsharedServiceRepository;
@@ -224,13 +223,9 @@ public class JwtTokenProvider {
         }
     }
 
-    public boolean validateServiceToken(CheckTokenRequest request) {
+    public boolean validateServiceToken(String token) {
         try {
-            Jws<Claims> claims = getJwsClaimsFromToken(request.getToken());
-            boolean toServiceIdIsTrue = request.getToServiceId().equals(UUID.fromString(claims.getBody().get("to_service", String.class)));
-            boolean fromServiceIdIsTrue = request.getFromServiceId().equals(UUID.fromString(claims.getBody().get("from_service", String.class)));
-            if (!toServiceIdIsTrue || !fromServiceIdIsTrue)
-                return false;
+            Jws<Claims> claims = getJwsClaimsFromToken(token);
 
             Date date = claims.getBody().getExpiration();
             if (date.before(new Date())) {
@@ -238,12 +233,12 @@ public class JwtTokenProvider {
                 return false;
             }
 
-            boolean isPresentToServiceId = socsharedServiceRepository.existsById(request.getToServiceId());
-            boolean isPresentFromServiceId = socsharedServiceRepository.existsById(request.getFromServiceId());
+            boolean isPresentToServiceId = socsharedServiceRepository.existsById(UUID.fromString(claims.getBody().get("to_service", String.class)));
+            boolean isPresentFromServiceId = socsharedServiceRepository.existsById(UUID.fromString(claims.getBody().get("from_service", String.class)));
 
             return isPresentToServiceId && isPresentFromServiceId &&
-                    serviceTokenRepository.findByToServiceIdAndFromServiceId(request.getToServiceId(),
-                            request.getFromServiceId()).orElse(null) != null;
+                    serviceTokenRepository.findByToServiceIdAndFromServiceId(UUID.fromString(claims.getBody().get("to_service", String.class)),
+                            UUID.fromString(claims.getBody().get("from_service", String.class))).orElse(null) != null;
         } catch (JwtException | IllegalArgumentException exc) {
             if (exc instanceof ExpiredJwtException) {
                 log.warn("JWT Token is expired.");

@@ -51,7 +51,7 @@ public class STokenServiceImpl implements STokenService {
         log.info("checking data service to");
 
         SuccessResponse successResponse = new SuccessResponse();
-        successResponse.setSuccess(jwtTokenProvider.validateServiceToken(request));
+        successResponse.setSuccess(jwtTokenProvider.validateServiceToken(request.getToken()));
 
         return successResponse;
     }
