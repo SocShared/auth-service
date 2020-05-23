@@ -40,5 +40,5 @@ bootJar {
 }
 
 springBoot {
-    mainClassName = 'ml.socshared.service.auth.Application'
+    mainClassName = 'ml.socshared.auth.Application'
 }
