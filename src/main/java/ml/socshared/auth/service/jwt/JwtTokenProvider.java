@@ -151,6 +151,7 @@ public class JwtTokenProvider {
         claimsAccess.put("typ", "bearer");
         claimsAccess.put("from_service", request.getFromServiceId().toString());
         claimsAccess.put("to_service", request.getToServiceId().toString());
+        claimsAccess.put("role", "SERVICE");
 
         Date now = new Date();
         Date expireIn = new Date(now.getTime() + 1000 * 60 * 30);
