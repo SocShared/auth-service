@@ -103,6 +103,7 @@ public class InitDatabase implements InitializingBean {
             socsharedServiceRepository.save(socsharedService);
             log.info("HIBERNATE init service Service Storage");
         } catch (Exception ignore) {}
+
     }
 
 }

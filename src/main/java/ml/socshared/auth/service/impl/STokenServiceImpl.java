@@ -41,6 +41,9 @@ public class STokenServiceImpl implements STokenService {
         serviceToken.setTokenExpireIn(serviceTokenResponse.getExpireIn());
         serviceToken.setToServiceId(request.getToServiceId());
 
+        serviceTokenRepository.findByToServiceIdAndFromServiceId(request.getToServiceId(), request.getFromServiceId())
+                .ifPresent(token -> serviceTokenRepository.deleteById(token.getTokenId()));
+
         serviceTokenRepository.save(serviceToken);
 
         return serviceTokenResponse;
