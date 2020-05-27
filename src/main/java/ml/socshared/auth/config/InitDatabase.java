@@ -166,6 +166,15 @@ public class InitDatabase implements InitializingBean {
             socsharedServiceRepository.save(socsharedService);
             log.info("HIBERNATE init service System Statistic Service");
         } catch (Exception ignore) {}
+        try {
+            SocsharedService socsharedService = new SocsharedService();
+            socsharedService.setHostUrl("https://auth.socshared.ml");
+            socsharedService.setServiceName("Auth Service");
+            socsharedService.setServiceId(UUID.fromString("58c2b3d5-dfad-41af-9451-d0a26fdc9019"));
+            socsharedService.setServiceSecret(UUID.fromString("0cb9bb2e-ee6a-48b7-b36a-23fb07f3fa28"));
+            socsharedServiceRepository.save(socsharedService);
+            log.info("HIBERNATE init service Auth Service");
+        } catch (Exception ignore) {}
     }
 
 }

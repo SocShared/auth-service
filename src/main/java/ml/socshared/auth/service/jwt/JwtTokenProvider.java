@@ -36,7 +36,6 @@ public class JwtTokenProvider {
     @Value("${jwt.refresh_token.expired}")
     private long validityRefreshTokenInMilliseconds;
 
-    private final UserService userService;
     private final SessionService sessionService;
     private final SocsharedServiceRepository socsharedServiceRepository;
     private final ServiceTokenRepository serviceTokenRepository;

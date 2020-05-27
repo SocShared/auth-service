@@ -49,10 +49,13 @@ public class UserServiceImpl implements UserService {
     @Value("${main.host}")
     private String mainHost;
 
+    @Value("#{tokenGetter.getTokenMail()}")
+    private String token;
+
     @Override
     public UserResponse add(NewUserRequest request) {
         log.info("saving -> {}", request);
-
+        System.out.println(token);
         boolean isErrorUsername = false;
         if (userRepository.findByUsername(request.getUsername()).orElse(null) != null) {
             isErrorUsername = true;
@@ -94,15 +97,12 @@ public class UserServiceImpl implements UserService {
         code.setType(GeneratingCode.Type.EMAIL_CONFIRMATION);
 
         GeneratingCode c = generatingCodeRepository.save(code);
-        mailSenderClient.send(SendMessageRequest.builder()
+        mailSenderClient.sendMailConfirm(SendMessageMailConfirmRequest.builder()
                 .subject("SocShared - Подтвердите электронную почту")
-                .text("Здравствуйте, " + user.getUsername() + ".<br><br>Для того, чтобы воспользоваться всеми услугами сервиса SocShared, " +
-                        "подтвердите, пожалуйста, Вашу электронную почту, перейдя по следующей ссылке, <a href=\""+mainHost+"account/" +
-                        c.getGeneratingLink() + "\">Подтвердить почту</a>. Срок действия данной ссылки 24 часа.<br><br>" + "" +
-                        "С уважением, администрация сервиса SocShared.")
-                .toEmails(new ArrayList<>() {{add(u.getEmail());}})
-                .build()
-        );
+                .username(user.getUsername())
+                .toEmail(u.getEmail())
+                .link(mainHost + "account/" + c.getGeneratingLink())
+                .build(), token);
 
         return new UserResponse(u);
     }
