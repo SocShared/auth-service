@@ -55,7 +55,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse add(NewUserRequest request) {
         log.info("saving -> {}", request);
-        System.out.println(token);
         boolean isErrorUsername = false;
         if (userRepository.findByUsername(request.getUsername()).orElse(null) != null) {
             isErrorUsername = true;

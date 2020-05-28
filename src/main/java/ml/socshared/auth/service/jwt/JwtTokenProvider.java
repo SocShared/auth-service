@@ -9,6 +9,7 @@ import ml.socshared.auth.domain.request.ServiceTokenRequest;
 import ml.socshared.auth.domain.response.ServiceTokenResponse;
 import ml.socshared.auth.entity.*;
 import ml.socshared.auth.exception.impl.AuthenticationException;
+import ml.socshared.auth.exception.impl.HttpNotFoundException;
 import ml.socshared.auth.repository.ServiceTokenRepository;
 import ml.socshared.auth.service.SessionService;
 import ml.socshared.auth.service.UserService;
@@ -160,6 +161,16 @@ public class JwtTokenProvider {
                 .setExpiration(expireIn)
                 .signWith(SignatureAlgorithm.HS512, secretKey);
 
+        ServiceToken token = serviceTokenRepository.findByToServiceIdAndFromServiceId(request.getToServiceId(), request.getFromServiceId())
+                .orElse(new ServiceToken());
+        token.setFromService(socsharedServiceRepository.findById(request.getFromServiceId())
+                .orElseThrow(() -> new HttpNotFoundException("Not found service by id")));
+        token.setToken(builder.compact());
+        token.setTokenExpireIn(expireIn.getTime());
+        token.setToServiceId(request.getToServiceId());
+
+        serviceTokenRepository.save(token);
+
         return ServiceTokenResponse.builder()
                 .expireIn(expireIn.getTime())
                 .fromService(request.getFromServiceId().toString())
@@ -232,13 +243,15 @@ public class JwtTokenProvider {
                 log.warn("JWT Token is expired.");
                 return false;
             }
+            UUID toService = UUID.fromString(claims.getBody().get("to_service", String.class));
+            UUID fromService = UUID.fromString(claims.getBody().get("from_service", String.class));
+            boolean isPresentToServiceId = socsharedServiceRepository.existsById(toService);
+            boolean isPresentFromServiceId = socsharedServiceRepository.existsById(fromService);
 
-            boolean isPresentToServiceId = socsharedServiceRepository.existsById(UUID.fromString(claims.getBody().get("to_service", String.class)));
-            boolean isPresentFromServiceId = socsharedServiceRepository.existsById(UUID.fromString(claims.getBody().get("from_service", String.class)));
+            ServiceToken serviceToken = serviceTokenRepository.findByToServiceIdAndFromServiceId(toService, fromService).orElse(null);
 
-            return isPresentToServiceId && isPresentFromServiceId &&
-                    serviceTokenRepository.findByToServiceIdAndFromServiceId(UUID.fromString(claims.getBody().get("to_service", String.class)),
-                            UUID.fromString(claims.getBody().get("from_service", String.class))).orElse(null) != null;
+            return isPresentToServiceId && isPresentFromServiceId && serviceToken != null;
+
         } catch (JwtException | IllegalArgumentException exc) {
             if (exc instanceof ExpiredJwtException) {
                 log.warn("JWT Token is expired.");

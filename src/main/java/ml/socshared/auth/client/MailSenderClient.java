@@ -6,6 +6,7 @@ import ml.socshared.auth.domain.response.SuccessResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 @FeignClient(name = "mail-sender-client", url = "${feign.url.mail:}")
