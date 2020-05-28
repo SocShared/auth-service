@@ -1,6 +1,7 @@
 package ml.socshared.auth.service.token;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ml.socshared.auth.domain.request.ServiceTokenRequest;
 import ml.socshared.auth.repository.ServiceTokenRepository;
 import ml.socshared.auth.service.jwt.JwtTokenProvider;
@@ -10,6 +11,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class TokenGetter {
 
     private final JwtTokenProvider jwtTokenProvider;
