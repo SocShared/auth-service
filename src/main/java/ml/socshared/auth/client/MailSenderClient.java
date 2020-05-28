@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public interface MailSenderClient {
 
     @PostMapping(value = "/api/v1/private/message", produces = MediaType.APPLICATION_JSON_VALUE)
-    SuccessResponse send(@RequestBody SendMessageRequest request, @RequestHeader("Authorization") String token);
+    SuccessResponse send(SendMessageRequest request, @RequestHeader("Authorization") String token);
 
     @PostMapping(value = "/api/v1/private/message/confirm/mail", produces = MediaType.APPLICATION_JSON_VALUE)
-    SuccessResponse sendMailConfirm(@RequestBody SendMessageMailConfirmRequest request, @RequestHeader("Authorization") String token);
+    SuccessResponse sendMailConfirm(SendMessageMailConfirmRequest request, @RequestHeader("Authorization") String token);
 
 }
