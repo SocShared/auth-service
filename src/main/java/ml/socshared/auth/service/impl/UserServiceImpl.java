@@ -100,7 +100,7 @@ public class UserServiceImpl implements UserService {
                 .subject("SocShared - Подтвердите электронную почту")
                 .username(user.getUsername())
                 .toEmail(u.getEmail())
-                .link(mainHost + "account/mail/" + c.getGeneratingLink())
+                .link(mainHost + "account/email/" + c.getGeneratingLink())
                 .build(), token);
 
         return new UserResponse(u);
