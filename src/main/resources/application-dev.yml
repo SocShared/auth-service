@@ -17,7 +17,7 @@ spring:
 
 feign:
   url:
-    mail: ${$MAIL_SENDER:localhost:8585}
+    mail: ${MAIL_SENDER:localhost:8585}
 
 main:
   host: https://auth.socshared.ml/
