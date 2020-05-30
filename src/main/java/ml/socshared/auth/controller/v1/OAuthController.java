@@ -1,7 +1,9 @@
 package ml.socshared.auth.controller.v1;
 
 import lombok.RequiredArgsConstructor;
+import ml.socshared.auth.domain.request.CheckTokenRequest;
 import ml.socshared.auth.domain.request.oauth.OAuthFlowRequest;
+import ml.socshared.auth.domain.response.SuccessResponse;
 import ml.socshared.auth.service.OAuthService;
 import ml.socshared.auth.domain.response.OAuth2TokenResponse;
 import ml.socshared.auth.exception.impl.OAuth2Exception;
@@ -35,6 +37,12 @@ public class OAuthController {
                 return oAuthService.getTokenByClientCredentials(oAuthFlowRequest);
         }
         throw new OAuth2Exception("GrantType undefined.");
+    }
+
+    @PostMapping(value = "/oauth/validate_token", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public SuccessResponse isValidateToken(@Valid @RequestBody CheckTokenRequest request) {
+        return oAuthService.checkValidateAccessToken(request);
     }
 
 }

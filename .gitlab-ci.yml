@@ -35,7 +35,7 @@ docker-deploy-swarm:
     - echo "SPRING_PROFILE=dev" >> .env_session
     - echo "POSTGRES_USER=admin" >> .env_session
     - echo "POSTGRES_PASSWORD=admin" >> .env_session
-    - echo "POSTGRES_HOST=auth_postgres_db" >> .env_session
+    - echo "POSTGRES_HOST=10.166.0.24:5533" >> .env_session
     - echo "POSTGRES_DB=auth" >> .env_session
     - echo "SECRET_JWT_KEY=$SECRET_JWT_KEY" >> .env_session
     - echo "MAIL_SENDER=$MAIL_SENDER" >> .env_session

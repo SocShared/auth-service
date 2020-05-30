@@ -4,7 +4,9 @@ import com.google.common.hash.Hashing;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ml.socshared.auth.domain.request.AuthRequest;
+import ml.socshared.auth.domain.request.CheckTokenRequest;
 import ml.socshared.auth.domain.request.ClientCredentialsRequest;
+import ml.socshared.auth.domain.response.SuccessResponse;
 import ml.socshared.auth.entity.Client;
 import ml.socshared.auth.entity.User;
 import ml.socshared.auth.exception.impl.AuthenticationException;
@@ -145,5 +147,15 @@ public class OAuthServiceImpl implements OAuthService {
 
         throw new AuthenticationException("Authentication failed");
 
+    }
+
+    @Override
+    public SuccessResponse checkValidateAccessToken(CheckTokenRequest request) {
+        log.info("checking data service to");
+
+        SuccessResponse successResponse = new SuccessResponse();
+        successResponse.setSuccess(jwtTokenProvider.validateAccessToken(request.getToken()));
+
+        return successResponse;
     }
 }
