@@ -19,11 +19,15 @@ public class TokenGetter {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    private final TokenObject tokenMail;
+    private TokenObject tokenMail;
 
-    public TokenGetter(JwtTokenProvider jwtTokenProvider, TokenObject tokenMail) {
+    public TokenGetter(JwtTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
-        this.tokenMail = tokenMail;
+        init();
+    }
+
+    private void init() {
+        this.tokenMail = new TokenObject();
     }
 
     @Before("execution(* ml.socshared.auth.service.impl.*.*(..))")
