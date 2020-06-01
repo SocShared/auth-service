@@ -33,6 +33,8 @@ public class JwtTokenProvider {
     private long validityAccessTokenInMilliseconds;
     @Value("${jwt.refresh_token.expired}")
     private long validityRefreshTokenInMilliseconds;
+    @Value("${jwt.service_token.expired}")
+    private long validityServiceTokenInMilliseconds;
 
     private final SessionService sessionService;
     private final SocsharedServiceRepository socsharedServiceRepository;
@@ -151,7 +153,7 @@ public class JwtTokenProvider {
         claimsAccess.put("role", "SERVICE");
 
         Date now = new Date();
-        Date expireIn = new Date(now.getTime() + 1000 * 60 * 30);
+        Date expireIn = new Date(now.getTime() + validityServiceTokenInMilliseconds);
         JwtBuilder builder = Jwts.builder()
                 .setClaims(claimsAccess)
                 .setIssuedAt(now)

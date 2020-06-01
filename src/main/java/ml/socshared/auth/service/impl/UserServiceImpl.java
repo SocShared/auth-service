@@ -4,6 +4,7 @@ import com.google.common.hash.Hashing;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ml.socshared.auth.client.MailSenderClient;
+import ml.socshared.auth.domain.model.TokenObject;
 import ml.socshared.auth.domain.model.UserModel;
 import ml.socshared.auth.domain.request.*;
 import ml.socshared.auth.domain.request.*;
@@ -49,8 +50,8 @@ public class UserServiceImpl implements UserService {
     @Value("${main.host}")
     private String mainHost;
 
-    @Value("#{tokenGetter.getTokenMail()}")
-    private String token;
+    @Value("#{tokenGetter.tokenMail}")
+    private TokenObject token;
 
     @Override
     public UserResponse add(NewUserRequest request) {
@@ -101,7 +102,7 @@ public class UserServiceImpl implements UserService {
                 .username(user.getUsername())
                 .toEmail(u.getEmail())
                 .link(mainHost + "account/email/" + c.getGeneratingLink())
-                .build(), token);
+                .build(), "Bearer " + token.getToken());
 
         return new UserResponse(u);
     }

@@ -2,23 +2,33 @@ package ml.socshared.auth.service.token;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ml.socshared.auth.domain.model.TokenObject;
 import ml.socshared.auth.domain.request.ServiceTokenRequest;
+import ml.socshared.auth.entity.ServiceToken;
 import ml.socshared.auth.service.jwt.JwtTokenProvider;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-@RequiredArgsConstructor
 @Service
 @Slf4j
+@Aspect
 public class TokenGetter {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    private String tokenMail;
+    private final TokenObject tokenMail;
 
-    public String getTokenMail() {
-        if (tokenMail != null && jwtTokenProvider.validateServiceToken(tokenMail)) {
+    public TokenGetter(JwtTokenProvider jwtTokenProvider, TokenObject tokenMail) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.tokenMail = tokenMail;
+    }
+
+    @Before("execution(* ml.socshared.auth.service.impl.*.*(..))")
+    public TokenObject getTokenMail() {
+        if (tokenMail.getToken() != null && jwtTokenProvider.validateServiceToken(tokenMail.getToken())) {
             return tokenMail;
         }
 
@@ -27,7 +37,9 @@ public class TokenGetter {
         request.setToServiceId(UUID.fromString("68c5c6d9-fb18-4adb-800e-faac3ac745b9"));
         request.setToSecretService(UUID.fromString("a981045d-e269-4b28-b7b7-af4a885b9dc4"));
 
-        return "Bearer " + jwtTokenProvider.buildServiceToken(request).getToken();
+        this.tokenMail.setToken(jwtTokenProvider.buildServiceToken(request).getToken());
+
+        return tokenMail;
     }
 
 }
