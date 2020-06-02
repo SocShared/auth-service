@@ -35,7 +35,7 @@ public class OAuthServiceImpl implements OAuthService {
     private final ClientService clientService;
 
     @Override
-    public OAuth2TokenResponse getTokenByUsernameAndPassword(OAuthFlowRequest request) {
+    public OAuth2TokenResponse getTokenByUsernameAndPassword(OAuthFlowRequest request) throws AuthenticationException {
         log.info("getting token by password grant type");
 
         if (request.getUsername() == null)

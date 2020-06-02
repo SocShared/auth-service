@@ -1,4 +1,10 @@
 server:
+  servlet:
+    session:
+      cookie:
+        domain: .socshared.ml
+        http-only: true
+        path: /
   port: 9999
   error:
     whitelabel:
@@ -16,4 +22,6 @@ jwt:
   refresh_token:
     expired: 2592000000
   service_token:
-    expired: 20000
+    expired: 1800000
+
+

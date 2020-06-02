@@ -44,9 +44,16 @@ public class PasswordConstraintValidator implements ConstraintValidator<ValidPas
         List<String> messages = validator.getMessages(result);
 
         String messageTemplate = String.join(",", messages);
-        context.buildConstraintViolationWithTemplate(messageTemplate)
-                .addConstraintViolation()
-                .disableDefaultConstraintViolation();
+        context.buildConstraintViolationWithTemplate(messageTemplate
+                .replaceAll("Password must be", "Пароль должен состоять из")
+                .replaceAll("or more characters in length", "или более символов")
+                .replaceAll("Password must contain", "Пароль должен содержать ")
+                .replaceAll("or more uppercase characters", "или более заглавных букв")
+                .replaceAll("Password must contain", "Пароль должен содержать")
+                .replaceAll("or more lowercase characters", "или более строчных букв")
+                .replaceAll("Password must contain", "Пароль должен содержать")
+                .replaceAll("or more digit characters", "или более цифр")
+        ).addConstraintViolation().disableDefaultConstraintViolation();
         return false;
     }
 }

@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
     private TokenObject token;
 
     @Override
-    public UserResponse add(NewUserRequest request) {
+    public UserResponse add(NewUserRequest request) throws UsernameAndEmailIsExistsException, UsernameIsExistsException, EmailIsExistsException {
         log.info("saving -> {}", request);
         boolean isErrorUsername = false;
         if (userRepository.findByUsername(request.getUsername()).orElse(null) != null) {
