@@ -49,11 +49,13 @@ public class SignInWebController {
                 Cookie accessToken = new Cookie("JWT_AT", res.getAccessToken());
                 accessToken.setMaxAge(24 * 60 * 60);
                 accessToken.setSecure(true);
+                accessToken.setPath(".socshared.ml");
                 response.addCookie(accessToken);
 
                 Cookie refreshToken = new Cookie("JWT_RT", res.getRefreshToken());
                 refreshToken.setMaxAge(24 * 60 * 60 * 30);
                 refreshToken.setSecure(true);
+                refreshToken.setPath(".socshared.ml");
                 response.addCookie(refreshToken);
             }
         }
@@ -78,11 +80,13 @@ public class SignInWebController {
             Cookie accessToken = new Cookie("JWT_AT", token.getAccessToken());
             accessToken.setMaxAge(24 * 60 * 60);
             accessToken.setSecure(true);
+            accessToken.setPath(".socshared.ml");
             response.addCookie(accessToken);
 
             Cookie refreshToken = new Cookie("JWT_RT", token.getRefreshToken());
             refreshToken.setMaxAge(24 * 60 * 60 * 30);
             refreshToken.setSecure(true);
+            refreshToken.setPath(".socshared.ml");
             response.addCookie(refreshToken);
         } catch (AuthenticationException exc) {
             bindingResult.addError(new FieldError("user", "password", "Неверный логин или пароль"));
