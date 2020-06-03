@@ -46,19 +46,21 @@ public class SignInWebController {
                 req.setGrantType(TypeFlow.REFRESH_TOKEN);
                 req.setRefreshToken(rtToken);
                 OAuth2TokenResponse res = oAuthService.getTokenByRefreshToken(req);
-                Cookie accessToken = new Cookie("JWT_AT", res.getAccessToken());
-                accessToken.setMaxAge(24 * 60 * 60);
-                accessToken.setSecure(true);
-                accessToken.setPath("/");
-                accessToken.setDomain(".socshared.ml");
-                response.addCookie(accessToken);
-
-                Cookie refreshToken = new Cookie("JWT_RT", res.getRefreshToken());
-                refreshToken.setMaxAge(24 * 60 * 60 * 30);
-                refreshToken.setSecure(true);
-                refreshToken.setPath("/");
-                accessToken.setDomain(".socshared.ml");
-                response.addCookie(refreshToken);
+//                Cookie accessToken = new Cookie("JWT_AT", res.getAccessToken());
+//                accessToken.setMaxAge(24 * 60 * 60);
+//                accessToken.setSecure(true);
+//                accessToken.setPath("/");
+//                accessToken.setDomain(".socshared.ml");
+//                response.addCookie(accessToken);
+//
+//                Cookie refreshToken = new Cookie("JWT_RT", res.getRefreshToken());
+//                refreshToken.setMaxAge(24 * 60 * 60 * 30);
+////                refreshToken.setSecure(true);
+////                refreshToken.setPath("/");
+////                refreshToken.setDomain(".socshared.ml");
+////                response.addCookie(refreshToken);
+                response.setHeader("Set-Cookie", "JWT_AT="+res.getAccessToken()+"; Domain=.socshared.ml");
+                response.setHeader("Set-Cookie", "JWT_RT="+res.getRefreshToken()+"; Domain=.socshared.ml");
             }
         }
         return "redirect:https://socshared.ml/room";
