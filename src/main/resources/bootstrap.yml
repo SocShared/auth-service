@@ -1,4 +1,10 @@
 server:
+  servlet:
+    session:
+      cookie:
+        domain: socshared.ml
+        http-only: true
+        secure: true
   port: 9999
   error:
     whitelabel:
