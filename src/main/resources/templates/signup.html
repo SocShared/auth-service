@@ -63,9 +63,8 @@
                     <label for="last-name-text">Введите свою Фамилию</label>
                     <input id="last-name-text" type="text" class="form-control" placeholder="Фамилия">
                 </div>
-                <button id="input-modal-btn" class="btn btn-outline-dark btn-lg mb-2" type="button"
-                        onclick="openInputModal()">Вход
-                </button>
+                <a id="input-modal-btn" class="btn btn-outline-dark btn-lg mb-2" type="button" th:href="@{/signin}">Вход
+                </a>
                 <input id="btn-sign-in" type="submit" class="btn btn-outline-secondary my_btn btn-lg mb-2" value="Зарегистрироваться"/>
             </form>
 
