@@ -19,7 +19,7 @@
 <main class="content mt-3 mb-3">
     <div class="card mx-auto" style="max-width: 35rem;">
         <div class="card-body justify-content-center">
-            <form id="log-in-form" th:action="@{/signin}" th:object="${user}"  class="needs-validation" method="post" novalidate>
+            <form id="log-in-form" th:action="@{/signin}" th:object="${user}"  class="needs-validation" method="post">
                 <h3 class="text-center">Вход</h3>
                 <hr/>
                 <div class="form-group">
@@ -44,8 +44,8 @@
                 </div>
                 <div class="text-center">
                     <input id="btn-log-in-form" type="submit" class="btn btn-outline-secondary my_btn btn-lg mb-2" value="Войти"/>
-                    <button id="input-modal-btn" class="btn btn-outline-dark btn-lg mb-2" type="button">Зарегистрироваться
-                    </button>
+                    <a id="input-modal-btn" class="btn btn-outline-dark btn-lg mb-2" type="button" th:href="@{/signup.html}">Зарегистрироваться
+                    </a>
                 </div>
             </form>
         </div>
