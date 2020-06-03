@@ -2,6 +2,10 @@
     margin: 0;
     padding: 0;
 }
+body {
+    background-image: url(/img/background.png);
+}
+
 
 html, body.wrapper {
     min-height: 100%;
@@ -134,3 +138,4 @@ footer {
     margin: 0 auto;
     pointer-events: all;
 }
+
