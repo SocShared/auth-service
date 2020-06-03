@@ -51,7 +51,7 @@ public class SignInWebController {
                 accessToken.setSecure(true);
                 accessToken.setHttpOnly(true);
                 accessToken.setPath("/");
-                accessToken.setDomain(".socshared.ml");
+                accessToken.setDomain("socshared.ml");
                 response.addCookie(accessToken);
 
                 Cookie refreshToken = new Cookie("JWT_RT", res.getRefreshToken());
@@ -59,7 +59,7 @@ public class SignInWebController {
                 refreshToken.setSecure(true);
                 refreshToken.setHttpOnly(true);
                 refreshToken.setPath("/");
-                refreshToken.setDomain(".socshared.ml");
+                refreshToken.setDomain("socshared.ml");
                 response.addCookie(refreshToken);
             }
         }
@@ -86,7 +86,7 @@ public class SignInWebController {
             accessToken.setSecure(true);
             accessToken.setHttpOnly(true);
             accessToken.setPath("/");
-            accessToken.setDomain(".socshared.ml");
+            accessToken.setDomain("socshared.ml");
             response.addCookie(accessToken);
 
             Cookie refreshToken = new Cookie("JWT_RT", token.getRefreshToken());
@@ -94,7 +94,7 @@ public class SignInWebController {
             refreshToken.setSecure(true);
             refreshToken.setHttpOnly(true);
             refreshToken.setPath("/");
-            refreshToken.setDomain(".socshared.ml");
+            refreshToken.setDomain("socshared.ml");
             response.addCookie(refreshToken);
         } catch (AuthenticationException exc) {
             bindingResult.addError(new FieldError("user", "password", "Неверный логин или пароль"));
