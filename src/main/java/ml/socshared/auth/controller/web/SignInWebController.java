@@ -63,7 +63,7 @@ public class SignInWebController {
                 response.addCookie(refreshToken);
             }
         }
-        return "redirect:https://socshared.ml/room";
+        return "redirect:https://socshared.ml/social";
     }
 
     @PostMapping("/signin")
@@ -102,7 +102,7 @@ public class SignInWebController {
                 return "signin";
             }
         }
-        return "redirect:https://socshared.ml/room";
+        return "redirect:https://socshared.ml/social";
     }
 
 }
