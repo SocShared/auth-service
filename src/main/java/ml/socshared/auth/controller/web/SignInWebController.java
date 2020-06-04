@@ -68,8 +68,6 @@ public class SignInWebController {
 
     @PostMapping("/signin")
     public String submitForm(@Valid @ModelAttribute("user") AuthRequest request, BindingResult bindingResult, HttpServletResponse response) {
-
-
         if (bindingResult.hasErrors())
             return "signin";
         OAuthFlowRequest req = new OAuthFlowRequest();
