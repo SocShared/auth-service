@@ -231,6 +231,7 @@ public class JwtTokenProvider {
                 sessionService.save(session);
                 return false;
             }
+            log.info("refresh token session -> {}", session);
             return session != null && session.getRefreshToken() != null &&
                     session.getRefreshToken().getRefreshToken().equals(token);
         } catch (JwtException | IllegalArgumentException exc) {
@@ -239,6 +240,7 @@ public class JwtTokenProvider {
             } else {
                 log.warn("JWT Token is invalid.");
             }
+            log.error(exc.getMessage());
             return false;
         }
     }

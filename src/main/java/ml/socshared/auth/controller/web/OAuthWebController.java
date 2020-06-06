@@ -32,10 +32,8 @@ public class OAuthWebController {
     private final JwtTokenProvider provider;
 
     @GetMapping("/oauth/authorize")
-    public String authorizedCode(@NotNull @RequestParam(name = "client_id") UUID clientId,
-                                 @NotNull @RequestParam(name = "response_type") String responseType,
-                                 @NotNull @RequestParam(name = "state") String state,
-                                 @NotNull @RequestParam(name = "redirect_uri") String redirectUri,
+    public String authorizedCode(@RequestParam(name = "client_id") UUID clientId, @RequestParam(name = "response_type") String responseType,
+                                 @RequestParam(name = "state") String state, @RequestParam(name = "redirect_uri") String redirectUri,
                                  @CookieValue(name = "JWT_AT", defaultValue = "") String accessToken,
                                  Model model) {
         if (responseType.equals("code")) {
