@@ -18,7 +18,6 @@ public class Session extends BaseEntity {
 
     @Id
     @Column(name = "session_id")
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private UUID sessionId;
 
     @Column(name = "active_session")
@@ -49,8 +48,6 @@ public class Session extends BaseEntity {
                 ", offlineSession=" + offlineSession +
                 ", clientId=" + client.getClientId() +
                 ", userId=" + user.getUserId() +
-                ", accessToken=" + accessToken.getAccessToken() +
-                ", refreshToken=" + refreshToken.getRefreshToken() +
                 '}';
     }
 }

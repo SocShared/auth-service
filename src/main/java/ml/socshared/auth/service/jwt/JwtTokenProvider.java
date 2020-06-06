@@ -294,6 +294,7 @@ public class JwtTokenProvider {
         Session session = sessionService.findByClientIdAndUserId(client.getClientId(), user.getUserId());
         if (session == null) {
             session = new Session();
+            session.setSessionId(UUID.randomUUID());
             session.setClient(client);
             session.setUser(user);
             session.setActiveSession(false);
