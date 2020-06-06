@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public enum TypeFlow {
     @JsonProperty("password")
     PASSWORD,
-    @JsonProperty("refreshToken")
+    @JsonProperty("refresh_token")
     REFRESH_TOKEN,
-    @JsonProperty("authorizationCode")
+    @JsonProperty("authorization_code")
     AUTHORIZATION_CODE,
-    @JsonProperty("clientCredentials")
+    @JsonProperty("client_credentials")
     CLIENT_CREDENTIALS
 }
