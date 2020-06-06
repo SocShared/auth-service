@@ -56,6 +56,7 @@ public class SignUpWebController {
         if (bindingResult.hasErrors())
             return "signup";
 
+        model.addAttribute("title", "Регистрация");
         model.addAttribute("text", " Вы успешно зарегистрировались. Перед использованием системы подтвердите, пожалуйста свой логин и пароль.\n" +
                 "                <a href=\"https://socshared.ml\">Вернуться на главную</a>.");
         return "success";

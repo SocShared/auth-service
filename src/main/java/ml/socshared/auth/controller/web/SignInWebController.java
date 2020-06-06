@@ -173,6 +173,7 @@ public class SignInWebController {
             }
         }
 
+        model.addAttribute("title", "Изменение пароля");
         model.addAttribute("text", " Вам вышло письмо на почту для сброса пароля.\n" +
                 "                <a href=\"https://socshared.ml\">Вернуться на главную</a>.");
 
@@ -194,6 +195,7 @@ public class SignInWebController {
 
         userService.updatePassword(request.getUserId(), request);
 
+        model.addAttribute("title", "Изменение пароля");
         model.addAttribute("text", " Вы успешно изменили пароль.\n" +
                 "                <a href=\"https://socshared.ml\">Вернуться на главную</a>.");
 
@@ -209,6 +211,7 @@ public class SignInWebController {
                     getUpdatePasswordRequest().setUserId(generatingCode.getUserId());
                     return "set_password";
                 case EMAIL_CONFIRMATION:
+                    model.addAttribute("title", "Подтверждение электронной почты");
                     model.addAttribute("text", " Вы успешно подвтердили свою электронную почту.\n" +
                             "                <a href=\"https://socshared.ml\">Вернуться на главную</a>.");
                     return "success";
