@@ -185,6 +185,8 @@ public class SignInWebController {
         if (bindingResult.hasErrors())
             return "set_password";
 
+        System.out.println(request);
+
         if (!request.getPassword().equals(request.getRepeatPassword())) {
             bindingResult.addError(new ObjectError("email", "Введенный email не найден."));
             if (bindingResult.hasErrors()) {
@@ -206,7 +208,9 @@ public class SignInWebController {
         if (generatingCode != null) {
             switch (generatingCode.getType()) {
                 case RESET_PASSWORD:
-                    getUpdatePasswordRequest().setUserId(generatingCode.getUserId());
+                    UpdatePasswordRequest request = getUpdatePasswordRequest();
+                    request.setUserId(generatingCode.getUserId());
+                    model.addAttribute("password", request);
                     return "set_password";
                 case EMAIL_CONFIRMATION:
                     model.addAttribute("title", "Подтверждение электронной почты");

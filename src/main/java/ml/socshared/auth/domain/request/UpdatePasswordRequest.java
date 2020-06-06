@@ -15,7 +15,6 @@ import java.util.UUID;
 @EqualsAndHashCode
 public class UpdatePasswordRequest {
 
-    @NotNull
     private UUID userId;
     @ValidPassword
     private String password;
