@@ -17,14 +17,12 @@ import java.util.UUID;
 
 @Repository
 public interface ClientRepository extends JpaRepository<Client, UUID> {
-    @Query("select c from Client c where c.clientId = :clientId and c.clientSecret = :clientSecret")
-    Optional<Client> findByClientIdAndClientSecret(@Param("clientId") String clientId, @Param("clientSecret") String clientSecret);
-    @Query("select c from Client c where c.clientId = :clientId")
-    Optional<Client> findByClientId(@Param("clientId") String clientId);
+    Optional<Client> findByClientIdAndClientSecret(UUID clientId, UUID clientSecret);
+    Optional<Client> findByClientId(UUID clientId);
     @Query("select c from Client c where c.clientId = :clientId and c.user.userId = :userId")
-    Optional<Client> findByClientIdAndUserId(@Param("clientId") String clientId, @Param("userId") String userId);
+    Optional<Client> findByClientIdAndUserId(@Param("clientId") UUID clientId, @Param("userId") UUID userId);
     @Query("select c from Client c where c.user.userId = :userId")
-    Page<ClientModel> findByUserId(String userId, Pageable pageable);
+    Page<ClientModel> findByUserId(UUID userId, Pageable pageable);
     @Query("select c from Client c where c.status = 'ACTIVE' or c.status = 'NOT_ACTIVE'")
     Page<ClientModel> findAllClients(Pageable pageable);
     @Query("select c from Client c where c.status = 'ACTIVE'")
