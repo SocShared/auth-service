@@ -71,8 +71,9 @@ public class OAuthServiceImpl implements OAuthService {
             }
         }
 
-        if ((client.getAccessType() == Client.AccessType.CONFIDENTIAL && !clientService.checkData(clientCredentialsRequest).getSuccess())
-                || response == null) {
+        if ((client.getAccessType() == Client.AccessType.CONFIDENTIAL &&
+                !clientService.checkData(clientCredentialsRequest).getSuccess()) || response == null) {
+            log.warn("request -> {}", request.toString());
             throw new AuthenticationException("Authentication failed");
         }
 
@@ -105,6 +106,7 @@ public class OAuthServiceImpl implements OAuthService {
 
         if ((client.getAccessType() == Client.AccessType.CONFIDENTIAL && !clientService.checkData(clientCredentialsRequest).getSuccess())
                 || response == null) {
+            log.warn("request -> {}", request);
             throw new AuthenticationException("Authentication failed");
         }
 
@@ -145,6 +147,7 @@ public class OAuthServiceImpl implements OAuthService {
             return response;
         }
 
+        log.info("request -> {}", request);
         throw new AuthenticationException("Authentication failed");
 
     }
