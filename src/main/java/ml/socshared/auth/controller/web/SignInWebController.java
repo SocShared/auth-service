@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.UUID;
 
 @Controller
 @RequestMapping
@@ -179,8 +180,8 @@ public class SignInWebController {
         return "success";
     }
 
-    @PostMapping("/setpass")
-    public String setPass(@Valid @ModelAttribute("password") UpdatePasswordRequest request, Model model,
+    @PostMapping("/setpass/{userId}")
+    public String setPass(@Valid @ModelAttribute("password") UpdatePasswordRequest request, @PathVariable UUID userId, Model model,
                           BindingResult bindingResult, HttpServletResponse response) {
         if (bindingResult.hasErrors())
             return "set_password";
@@ -194,7 +195,7 @@ public class SignInWebController {
             }
         }
 
-        userService.updatePassword(request.getUserId(), request);
+        userService.updatePassword(userId, request);
 
         model.addAttribute("title", "Изменение пароля");
         model.addAttribute("text", " Вы успешно изменили пароль.");
