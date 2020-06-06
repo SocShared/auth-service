@@ -2,10 +2,7 @@ package ml.socshared.auth.controller.web;
 
 import lombok.RequiredArgsConstructor;
 import ml.socshared.auth.client.MailSenderClient;
-import ml.socshared.auth.domain.request.AuthRequest;
-import ml.socshared.auth.domain.request.NewUserRequest;
-import ml.socshared.auth.domain.request.SendMessageMailConfirmRequest;
-import ml.socshared.auth.domain.request.UpdatePasswordRequest;
+import ml.socshared.auth.domain.request.*;
 import ml.socshared.auth.domain.request.oauth.OAuthFlowRequest;
 import ml.socshared.auth.domain.request.oauth.TypeFlow;
 import ml.socshared.auth.domain.response.OAuth2TokenResponse;
@@ -48,6 +45,11 @@ public class SignInWebController {
     @ModelAttribute("password")
     public UpdatePasswordRequest getUpdatePasswordRequest() {
         return new UpdatePasswordRequest();
+    }
+
+    @ModelAttribute("email")
+    public SendMailRequest getSendMailRequest() {
+        return new SendMailRequest();
     }
 
     @GetMapping("/signin")
@@ -158,14 +160,14 @@ public class SignInWebController {
     }
 
     @PostMapping("/resetpass")
-    public String resetPasswordPost(@Valid @ModelAttribute("email") String email, Model model, BindingResult bindingResult, HttpServletResponse response) {
+    public String resetPasswordPost(@Valid @ModelAttribute("email") SendMailRequest request, Model model, BindingResult bindingResult, HttpServletResponse response) {
         if (bindingResult.hasErrors())
             return "reset_password";
 
         try {
-            userService.resetPassword(email);
+            userService.resetPassword(request.getEmail());
         } catch (HttpNotFoundException exc) {
-            bindingResult.addError(new ObjectError("email", "Введенный email не найден."));
+            bindingResult.addError(new FieldError("email", "email", "Введенный email не найден."));
             if (bindingResult.hasErrors()) {
                 return "reset_password";
             }
