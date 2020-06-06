@@ -10,12 +10,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 
@@ -57,8 +55,7 @@ public class SignUpWebController {
             return "signup";
 
         model.addAttribute("title", "Регистрация");
-        model.addAttribute("text", " Вы успешно зарегистрировались. Перед использованием системы подтвердите, пожалуйста свой логин и пароль.\n" +
-                "                <a href=\"https://socshared.ml\">Вернуться на главную</a>.");
+        model.addAttribute("text", " Вы успешно зарегистрировались. Перед использованием системы подтвердите, пожалуйста свой логин и пароль.");
         return "success";
     }
 
