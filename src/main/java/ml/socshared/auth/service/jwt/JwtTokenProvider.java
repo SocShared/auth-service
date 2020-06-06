@@ -10,9 +10,11 @@ import ml.socshared.auth.entity.*;
 import ml.socshared.auth.exception.impl.AuthenticationException;
 import ml.socshared.auth.exception.impl.HttpNotFoundException;
 import ml.socshared.auth.repository.ServiceTokenRepository;
+import ml.socshared.auth.repository.UserRepository;
 import ml.socshared.auth.service.SessionService;
 import ml.socshared.auth.domain.response.OAuth2TokenResponse;
 import ml.socshared.auth.repository.SocsharedServiceRepository;
+import ml.socshared.auth.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -37,13 +39,14 @@ public class JwtTokenProvider {
     private long validityServiceTokenInMilliseconds;
 
     private final SessionService sessionService;
+    private final UserRepository userRepository;
     private final SocsharedServiceRepository socsharedServiceRepository;
     private final ServiceTokenRepository serviceTokenRepository;
 
     public OAuth2TokenResponse createTokenByUsernameAndPassword(User user, Client client) {
         Session session = createSession(client, user);
 
-        Claims claimsAccess = JwtClaimsBuilder.buildJwtClaimsByUsernameAndPassword(user, client, session);
+        Claims claimsAccess = JwtClaimsBuilder.buildJwtClaimsByUserClientSession(user, client, session);
         String accessToken = generationToken(claimsAccess, validityAccessTokenInMilliseconds);
 
         String sessionId = claimsAccess.get("session_state", String.class);
@@ -87,19 +90,24 @@ public class JwtTokenProvider {
     public OAuth2TokenResponse createTokenByRefreshToken(String refreshToken, Client client) {
         Jws<Claims> refreshClaims = getJwsClaimsFromToken(refreshToken);
         UUID userId = UUID.fromString(refreshClaims.getBody().getSubject());
+        User user = userRepository.findById(userId).orElse(null);
+
+        if (user == null)
+            throw new AuthenticationException("Invalid user");
+
         Session session = sessionService.findByClientIdAndUserId(client.getClientId(), userId);
         if (session == null)
             throw new AuthenticationException("Invalid session");
 
-        Jws<Claims> accessClaims = getJwsClaimsFromToken(session.getAccessToken().getAccessToken());
+        Claims claimsAccess = JwtClaimsBuilder.buildJwtClaimsByUserClientSession(user, client, session);
+        String accessToken = generationToken(claimsAccess, validityAccessTokenInMilliseconds);
 
-        String accessToken = generationToken(accessClaims.getBody(), validityAccessTokenInMilliseconds);
         Claims claimsRefresh = refreshClaims.getBody();
         String newRefreshToken = generationToken(claimsRefresh, validityRefreshTokenInMilliseconds);
 
         OAuth2TokenResponse response = OAuth2TokenResponse.builder()
                 .accessToken(accessToken)
-                .expireIn(accessClaims.getBody().getExpiration().getTime())
+                .expireIn(claimsAccess.getExpiration().getTime())
                 .refreshToken(newRefreshToken)
                 .sessionId(session.getSessionId().toString())
                 .tokenType("bearer")
@@ -109,7 +117,7 @@ public class JwtTokenProvider {
         if (session.getAccessToken() != null)
             aToken.setTokenId(session.getAccessToken().getTokenId());
         aToken.setAccessToken(accessToken);
-        aToken.setExpireIn(accessClaims.getBody().getExpiration().getTime());
+        aToken.setExpireIn(claimsAccess.getExpiration().getTime());
         aToken.setSession(session);
         aToken.setTokenType("bearer");
         session.setAccessToken(aToken);

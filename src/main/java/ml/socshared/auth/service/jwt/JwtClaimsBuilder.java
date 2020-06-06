@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public class JwtClaimsBuilder {
 
-    public static Claims buildJwtClaimsByUsernameAndPassword(User user, Client client, Session session) {
+    public static Claims buildJwtClaimsByUserClientSession(User user, Client client, Session session) {
         Claims claimsAccess = Jwts.claims().setSubject(user.getUserId().toString());
         claimsAccess.put("auth_time", new Date().getTime());
         claimsAccess.put("session_state", session.getSessionId().toString());
