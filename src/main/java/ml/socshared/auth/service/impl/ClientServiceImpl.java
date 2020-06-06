@@ -60,7 +60,7 @@ public class ClientServiceImpl implements ClientService {
     public ClientResponse update(UUID userId, UUID id, NewClientRequest request) {
         log.info("saving -> {}", request);
 
-        Client client = clientRepository.findByClientIdAndUserId(id.toString(), userId.toString())
+        Client client = clientRepository.findByClientIdAndUserId(UUID.fromString(id.toString()), userId)
                 .orElseThrow(() -> new HttpNotFoundException("Not found client by id: " + id));
 
         client.setName(request.getName());
@@ -111,7 +111,8 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public SuccessResponse checkData(ClientCredentialsRequest request) {
         log.info("checking c and password");
-        Client client = clientRepository.findByClientIdAndClientSecret(request.getClientId(), request.getClientSecret()).orElse(null);
+        Client client = clientRepository.findByClientIdAndClientSecret(UUID.fromString(request.getClientId()),
+                UUID.fromString(request.getClientSecret())).orElse(null);
 
         SuccessResponse successResponse = new SuccessResponse();
         successResponse.setSuccess(client != null);
@@ -149,13 +150,13 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public ClientResponse findByUserIdAndClientId(UUID userId, UUID clientId) {
-        return new ClientResponse(clientRepository.findByClientIdAndUserId(clientId.toString(), userId.toString())
+        return new ClientResponse(clientRepository.findByClientIdAndUserId(clientId, userId)
                 .orElseThrow(() -> new HttpNotFoundException("Not found by user id and client id")));
     }
 
     @Override
     public Page<ClientModel> findByUserId(UUID userId, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
-        return clientRepository.findByUserId(userId.toString(), pageable);
+        return clientRepository.findByUserId(userId, pageable);
     }
 }
