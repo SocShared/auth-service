@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Controller
@@ -43,7 +44,9 @@ public class SignInWebController {
     }
 
     @GetMapping("/signin")
-    public String showSignInForm(@CookieValue(value = "JWT_AT", defaultValue = "") String jwtToken, @CookieValue(value = "JWT_RT", defaultValue = "") String rtToken,
+    public String showSignInForm(@RequestParam(name = "client_id", required = false) UUID clientId, @RequestParam(name = "response_type", required = false) String responseType,
+                                 @RequestParam(name = "state", required = false) String state, @RequestParam(name = "redirect_uri", required = false) String redirectUri,
+                                 @CookieValue(value = "JWT_AT", defaultValue = "") String jwtToken, @CookieValue(value = "JWT_RT", defaultValue = "") String rtToken,
                                  HttpServletResponse response) {
         if (jwtToken.isEmpty())
             return "signin";
@@ -72,6 +75,8 @@ public class SignInWebController {
                 refreshToken.setPath("/");
                 refreshToken.setDomain("socshared.ml");
                 response.addCookie(refreshToken);
+                if (clientId != null && responseType != null && state != null && redirectUri != null)
+                    return "redirect:"+String.format("/oauth/authorize?client_id=%s&response_type=%s&state=%s&redirect_uri=%s", clientId, responseType, state, redirectUri);
             }
         }
         return "redirect:https://socshared.ml/social";

@@ -36,7 +36,7 @@ public class OAuthWebController {
                                  @NotNull @RequestParam(name = "response_type") String responseType,
                                  @NotNull @RequestParam(name = "state") String state,
                                  @NotNull @RequestParam(name = "redirect_uri") String redirectUri,
-                                 @CookieValue(name = "JWT", defaultValue = "") String accessToken,
+                                 @CookieValue(name = "JWT_AT", defaultValue = "") String accessToken,
                                  Model model) {
         if (responseType.equals("code")) {
             if (!accessToken.isEmpty() && provider.validateAccessToken(accessToken)) {
@@ -54,7 +54,7 @@ public class OAuthWebController {
                 model.addAttribute("state", state);
                 return "proof_rights";
             } else {
-                return "redirect:/signin";
+                return "redirect:"+String.format("/signin?client_id=%s&response_type=%s&state=%s&redirect_uri=%s", clientId, responseType, state, redirectUri);
             }
         }
         return "redirect:https://socshared.ml";
