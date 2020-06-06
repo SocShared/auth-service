@@ -105,7 +105,9 @@ public class OAuthServiceImpl implements OAuthService {
             log.warn("token -> {}", response);
         }
 
-        if (!clientService.checkData(clientCredentialsRequest).getSuccess() || response == null) {
+        if ((client.getAccessType() == Client.AccessType.CONFIDENTIAL
+                && !clientService.checkData(clientCredentialsRequest).getSuccess())
+                || response == null) {
             log.warn("request -> {}", request);
             throw new AuthenticationException("Authentication failed");
         }

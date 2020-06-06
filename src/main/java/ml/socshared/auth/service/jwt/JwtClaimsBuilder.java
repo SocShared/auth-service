@@ -3,6 +3,7 @@ package ml.socshared.auth.service.jwt;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import ml.socshared.auth.entity.Client;
+import ml.socshared.auth.entity.Session;
 import ml.socshared.auth.entity.User;
 
 import java.util.Date;
@@ -10,10 +11,10 @@ import java.util.UUID;
 
 public class JwtClaimsBuilder {
 
-    public static Claims buildJwtClaimsByUsernameAndPassword(User user, Client client) {
+    public static Claims buildJwtClaimsByUsernameAndPassword(User user, Client client, Session session) {
         Claims claimsAccess = Jwts.claims().setSubject(user.getUserId().toString());
         claimsAccess.put("auth_time", new Date().getTime());
-        claimsAccess.put("session_state", UUID.randomUUID().toString());
+        claimsAccess.put("session_state", session.getSessionId().toString());
         claimsAccess.put("typ", "bearer");
         claimsAccess.put("roles", user.getRoleNames());
         claimsAccess.put("client_id", client.getClientId().toString());

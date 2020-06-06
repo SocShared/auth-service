@@ -41,7 +41,9 @@ public class JwtTokenProvider {
     private final ServiceTokenRepository serviceTokenRepository;
 
     public OAuth2TokenResponse createTokenByUsernameAndPassword(User user, Client client) {
-        Claims claimsAccess = JwtClaimsBuilder.buildJwtClaimsByUsernameAndPassword(user, client);
+        Session session = createSession(client, user);
+
+        Claims claimsAccess = JwtClaimsBuilder.buildJwtClaimsByUsernameAndPassword(user, client, session);
         String accessToken = generationToken(claimsAccess, validityAccessTokenInMilliseconds);
 
         String sessionId = claimsAccess.get("session_state", String.class);
@@ -50,7 +52,7 @@ public class JwtTokenProvider {
         claimsRefresh.put("session_state", sessionId);
         String refreshToken = generationToken(claimsRefresh, validityRefreshTokenInMilliseconds);
 
-        Session session = createSession(client, user, UUID.fromString(sessionId));
+        log.warn("session -> {}", session);
         OAuth2TokenResponse oAuth2TokenResponse = OAuth2TokenResponse.builder()
                 .accessToken(accessToken)
                 .expireIn(claimsAccess.getExpiration().getTime())
@@ -280,7 +282,7 @@ public class JwtTokenProvider {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
     }
 
-    public Session createSession(Client client, User user, UUID sessionId) {
+    public Session createSession(Client client, User user) {
         Session session = sessionService.findByClientIdAndUserId(client.getClientId(), user.getUserId());
         if (session == null) {
             session = new Session();
@@ -288,10 +290,9 @@ public class JwtTokenProvider {
             session.setUser(user);
             session.setActiveSession(false);
             session.setOfflineSession(true);
-            session.setSessionId(sessionId);
         }
         session.setActiveSession(true);
-        return session;
+        return sessionService.save(session);
     }
 
     public String resolveToken(HttpServletRequest request) {

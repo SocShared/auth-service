@@ -13,7 +13,6 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "session")
-@ToString
 @EqualsAndHashCode(callSuper = false)
 public class Session extends BaseEntity {
 
@@ -41,4 +40,16 @@ public class Session extends BaseEntity {
     @OneToOne(cascade = CascadeType.ALL)
     private OAuth2RefreshToken refreshToken;
 
+    @Override
+    public String toString() {
+        return "Session{" +
+                "sessionId=" + sessionId +
+                ", activeSession=" + activeSession +
+                ", offlineSession=" + offlineSession +
+                ", clientId=" + client.getClientId() +
+                ", userId=" + user.getUserId() +
+                ", accessToken=" + accessToken.getAccessToken() +
+                ", refreshToken=" + refreshToken.getRefreshToken() +
+                '}';
+    }
 }

@@ -16,7 +16,6 @@ import java.util.UUID;
 @Getter
 @Entity
 @Table(name = "role")
-@ToString
 @EqualsAndHashCode(callSuper = false)
 public class Role extends BaseEntity {
 
@@ -38,5 +37,13 @@ public class Role extends BaseEntity {
 
     public Role() {
         this.setStatus(Status.ACTIVE);
+    }
+
+    @Override
+    public String toString() {
+        return "Role{" +
+                "roleId=" + roleId +
+                ", name='" + name + '\'' +
+                '}';
     }
 }
