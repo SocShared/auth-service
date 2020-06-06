@@ -1,22 +1,15 @@
 package ml.socshared.auth.controller.web;
 
 import lombok.RequiredArgsConstructor;
-import ml.socshared.auth.client.MailSenderClient;
-import ml.socshared.auth.domain.request.*;
+import ml.socshared.auth.domain.request.SendMailRequest;
+import ml.socshared.auth.domain.request.UpdatePasswordRequest;
 import ml.socshared.auth.domain.request.oauth.OAuthFlowRequest;
 import ml.socshared.auth.domain.request.oauth.TypeFlow;
 import ml.socshared.auth.domain.response.OAuth2TokenResponse;
-import ml.socshared.auth.domain.response.SuccessResponse;
-import ml.socshared.auth.domain.response.UserResponse;
-import ml.socshared.auth.entity.GeneratingCode;
-import ml.socshared.auth.entity.User;
-import ml.socshared.auth.exception.impl.AuthenticationException;
 import ml.socshared.auth.exception.impl.HttpNotFoundException;
-import ml.socshared.auth.repository.UserRepository;
 import ml.socshared.auth.service.OAuthService;
 import ml.socshared.auth.service.UserService;
 import ml.socshared.auth.service.jwt.JwtTokenProvider;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -32,24 +25,30 @@ import java.util.UUID;
 @Controller
 @RequestMapping
 @RequiredArgsConstructor
-public class SignInWebController {
+public class ResetPassController {
 
     private final OAuthService oAuthService;
+    private final UserService userService;
     private final JwtTokenProvider provider;
 
-    @ModelAttribute("user")
-    public AuthRequest getAuthRequest() {
-        return new AuthRequest();
+    @ModelAttribute("password")
+    public UpdatePasswordRequest getUpdatePasswordRequest() {
+        return new UpdatePasswordRequest();
     }
 
-    @GetMapping("/signin")
-    public String showSignInForm(@CookieValue(value = "JWT_AT", defaultValue = "") String jwtToken, @CookieValue(value = "JWT_RT", defaultValue = "") String rtToken,
-                                 HttpServletResponse response) {
+    @ModelAttribute("email")
+    public SendMailRequest getSendMailRequest() {
+        return new SendMailRequest();
+    }
+
+    @GetMapping("/resetpass")
+    public String showResetPassForm(@CookieValue(value = "JWT_AT", defaultValue = "") String jwtToken, @CookieValue(value = "JWT_RT", defaultValue = "") String rtToken,
+                                    HttpServletResponse response) {
         if (jwtToken.isEmpty())
-            return "signin";
+            return "reset_password";
         else if (!provider.validateAccessToken(jwtToken)) {
             if (!provider.validateRefreshToken(rtToken))
-                return "signin";
+                return "reset_password";
             else {
                 OAuthFlowRequest req = new OAuthFlowRequest();
                 req.setClientId("360dad92-ecb1-44e7-990a-3152d2642919");
@@ -77,41 +76,45 @@ public class SignInWebController {
         return "redirect:https://socshared.ml/social";
     }
 
-    @PostMapping("/signin")
-    public String signIn(@Valid @ModelAttribute("user") AuthRequest request, BindingResult bindingResult, HttpServletResponse response) {
+    @PostMapping("/resetpass")
+    public String resetPasswordPost(@Valid @ModelAttribute("email") SendMailRequest request, Model model, BindingResult bindingResult, HttpServletResponse response) {
         if (bindingResult.hasErrors())
-            return "signin";
-        OAuthFlowRequest req = new OAuthFlowRequest();
-        req.setClientId("360dad92-ecb1-44e7-990a-3152d2642919");
-        req.setClientSecret("cb456410-85ca-43b5-9a12-87171ad84516");
-        req.setGrantType(TypeFlow.PASSWORD);
-        req.setUsername(request.getUsername());
-        req.setPassword(request.getPassword());
+            return "reset_password";
 
         try {
-            OAuth2TokenResponse token = oAuthService.getTokenByUsernameAndPassword(req);
-            Cookie accessToken = new Cookie("JWT_AT", token.getAccessToken());
-            accessToken.setMaxAge(24 * 60 * 60);
-            accessToken.setSecure(true);
-            accessToken.setHttpOnly(true);
-            accessToken.setPath("/");
-            accessToken.setDomain("socshared.ml");
-            response.addCookie(accessToken);
-
-            Cookie refreshToken = new Cookie("JWT_RT", token.getRefreshToken());
-            refreshToken.setMaxAge(24 * 60 * 60 * 30);
-            refreshToken.setSecure(true);
-            refreshToken.setHttpOnly(true);
-            refreshToken.setPath("/");
-            refreshToken.setDomain("socshared.ml");
-            response.addCookie(refreshToken);
-        } catch (AuthenticationException exc) {
-            bindingResult.addError(new FieldError("user", "password", "Неверный логин или пароль"));
+            userService.resetPassword(request.getEmail());
+        } catch (HttpNotFoundException exc) {
+            bindingResult.addError(new FieldError("email", "email", "Введенный email не найден."));
             if (bindingResult.hasErrors()) {
-                return "signin";
+                return "reset_password";
             }
         }
-        return "redirect:https://socshared.ml/social";
+
+        model.addAttribute("title", "Изменение пароля");
+        model.addAttribute("text", " Вам вышло письмо на почту для сброса пароля.");
+
+        return "success";
+    }
+
+    @PostMapping("/setpass/{userId}")
+    public String setPass(@Valid @ModelAttribute("password") UpdatePasswordRequest request, @PathVariable UUID userId, Model model,
+                          BindingResult bindingResult, HttpServletResponse response) {
+        if (bindingResult.hasErrors())
+            return "set_password";
+
+        if (!request.getPassword().equals(request.getRepeatPassword())) {
+            bindingResult.addError(new ObjectError("email", "Введенный email не найден."));
+            if (bindingResult.hasErrors()) {
+                return "set_password";
+            }
+        }
+
+        userService.updatePassword(userId, request);
+
+        model.addAttribute("title", "Изменение пароля");
+        model.addAttribute("text", " Вы успешно изменили пароль.");
+
+        return "success";
     }
 
 }

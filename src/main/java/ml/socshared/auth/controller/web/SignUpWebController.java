@@ -30,12 +30,12 @@ public class SignUpWebController {
     private final UserService service;
 
     @GetMapping("/signup")
-    public String showForm() {
+    public String showSignUpForm() {
         return "signup";
     }
 
     @PostMapping("/signup")
-    public String submitForm(@Valid @ModelAttribute("user") NewUserRequest request, Model model, BindingResult bindingResult) {
+    public String signUp(@Valid @ModelAttribute("user") NewUserRequest request, Model model, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             return "signup";
         try {
