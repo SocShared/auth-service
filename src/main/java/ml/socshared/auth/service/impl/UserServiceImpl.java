@@ -95,7 +95,7 @@ public class UserServiceImpl implements UserService {
         code.setType(GeneratingCode.Type.EMAIL_CONFIRMATION);
 
         GeneratingCode c = generatingCodeRepository.save(code);
-        mailSenderClient.sendMailConfirm(SendMessageMailConfirmRequest.builder()
+        mailSenderClient.sendMailConfirm(SendMessageGeneratingCodeRequest.builder()
                 .subject("SocShared - Подтвердите электронную почту")
                 .username(user.getUsername())
                 .toEmail(u.getEmail())
@@ -285,8 +285,8 @@ public class UserServiceImpl implements UserService {
 
         GeneratingCode c = generatingCodeRepository.save(code);
 
-        mailSenderClient.sendMailConfirm(SendMessageMailConfirmRequest.builder()
-                .subject("SocShared - Подтвердите электронную почту")
+        mailSenderClient.sendPasswordReset(SendMessageGeneratingCodeRequest.builder()
+                .subject("SocShared - Сброс пароля")
                 .username(user.getUsername())
                 .toEmail(user.getEmail())
                 .link(mainHost + "account/" + c.getGeneratingLink())

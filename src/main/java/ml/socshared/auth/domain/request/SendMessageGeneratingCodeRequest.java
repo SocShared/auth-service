@@ -11,7 +11,7 @@ import java.util.ArrayList;
 @Builder
 @ToString
 @EqualsAndHashCode
-public class SendMessageMailConfirmRequest {
+public class SendMessageGeneratingCodeRequest {
 
     @NotNull
     private String subject;
