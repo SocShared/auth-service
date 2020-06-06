@@ -102,10 +102,10 @@ public class OAuthServiceImpl implements OAuthService {
         OAuth2TokenResponse response = null;
         if (jwtTokenProvider.validateRefreshToken(request.getRefreshToken())) {
             response = jwtTokenProvider.createTokenByRefreshToken(request.getRefreshToken(), client);
+            log.warn("token -> {}", response);
         }
 
-        if ((client.getAccessType() == Client.AccessType.CONFIDENTIAL && !clientService.checkData(clientCredentialsRequest).getSuccess())
-                || response == null) {
+        if (!clientService.checkData(clientCredentialsRequest).getSuccess() || response == null) {
             log.warn("request -> {}", request);
             throw new AuthenticationException("Authentication failed");
         }
