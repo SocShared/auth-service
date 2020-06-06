@@ -183,12 +183,12 @@ public class SignInWebController {
     public String setPass(@Valid @ModelAttribute("password") UpdatePasswordRequest request, Model model,
                           BindingResult bindingResult, HttpServletResponse response) {
         if (bindingResult.hasErrors())
-            return "reset_password";
+            return "set_password";
 
         if (!request.getPassword().equals(request.getRepeatPassword())) {
             bindingResult.addError(new ObjectError("email", "Введенный email не найден."));
             if (bindingResult.hasErrors()) {
-                return "reset_password";
+                return "set_password";
             }
         }
 
