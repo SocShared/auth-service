@@ -7,6 +7,7 @@ import ml.socshared.auth.exception.impl.UsernameAndEmailIsExistsException;
 import ml.socshared.auth.exception.impl.UsernameIsExistsException;
 import ml.socshared.auth.service.UserService;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -36,7 +37,7 @@ public class SignUpWebController {
     }
 
     @PostMapping("/signup")
-    public String submitForm(@Valid @ModelAttribute("user") NewUserRequest request, BindingResult bindingResult) {
+    public String submitForm(@Valid @ModelAttribute("user") NewUserRequest request, Model model, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             return "signup";
         try {
@@ -54,6 +55,9 @@ public class SignUpWebController {
         }
         if (bindingResult.hasErrors())
             return "signup";
+
+        model.addAttribute("text", " Вы успешно зарегистрировались. Перед использованием системы подтвердите, пожалуйста свой логин и пароль.\n" +
+                "                <a href=\"https://socshared.ml\">Вернуться на главную</a>.");
         return "success";
     }
 

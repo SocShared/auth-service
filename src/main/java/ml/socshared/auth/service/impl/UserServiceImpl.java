@@ -7,7 +7,6 @@ import ml.socshared.auth.client.MailSenderClient;
 import ml.socshared.auth.domain.model.TokenObject;
 import ml.socshared.auth.domain.model.UserModel;
 import ml.socshared.auth.domain.request.*;
-import ml.socshared.auth.domain.request.*;
 import ml.socshared.auth.domain.response.SuccessResponse;
 import ml.socshared.auth.domain.response.UserResponse;
 import ml.socshared.auth.entity.GeneratingCode;
@@ -31,7 +30,6 @@ import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -101,7 +99,7 @@ public class UserServiceImpl implements UserService {
                 .subject("SocShared - Подтвердите электронную почту")
                 .username(user.getUsername())
                 .toEmail(u.getEmail())
-                .link(mainHost + "account/email/" + c.getGeneratingLink())
+                .link(mainHost + "account/" + c.getGeneratingLink())
                 .build(), "Bearer " + token.getToken());
 
         return new UserResponse(u);
@@ -137,7 +135,7 @@ public class UserServiceImpl implements UserService {
         );
 
         user.setPassword(request.getPassword());
-
+        user.setResetPassword(false);
         user = userRepository.save(user);
 
         return new UserResponse(user);
@@ -249,29 +247,51 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public SuccessResponse confirmEmail(String generatingLink) {
+    public GeneratingCode processGenerationLink(String generatingLink) {
         log.info("confirming email");
 
         GeneratingCode generatingCode = generatingCodeRepository.findById(generatingLink)
                 .orElse(null);
 
-        if (generatingCode != null && generatingCode.getType() == GeneratingCode.Type.EMAIL_CONFIRMATION
-                && generatingCode.getExpireIn().isAfter(LocalDateTime.now())) {
+        if (generatingCode != null && generatingCode.getExpireIn().isAfter(LocalDateTime.now())) {
             User user = userRepository.findById(generatingCode.getUserId()).orElse(null);
             if (user != null) {
-                user.setEmailVerified(true);
+                if (generatingCode.getType() == GeneratingCode.Type.EMAIL_CONFIRMATION) {
+                    user.setEmailVerified(true);
+                } else if (generatingCode.getType() == GeneratingCode.Type.RESET_PASSWORD) {
+                    user.setResetPassword(true);
+                }
                 generatingCodeRepository.deleteById(generatingLink);
                 userRepository.save(user);
-                SuccessResponse successResponse = new SuccessResponse();
-                successResponse.setSuccess(true);
-
-                return successResponse;
+                return generatingCode;
             }
-
         }
-        SuccessResponse successResponse = new SuccessResponse();
-        successResponse.setSuccess(false);
+        return null;
+    }
 
-        return successResponse;
+    @Override
+    public SuccessResponse resetPassword(String email) {
+
+        User user = userRepository.findByEmail(email).orElseThrow(HttpNotFoundException::new);
+        user.setResetPassword(true);
+        userRepository.save(user);
+
+        String link = GeneratorLinks.build();
+        GeneratingCode code = new GeneratingCode();
+        code.setGeneratingLink(link);
+        code.setUserId(user.getUserId());
+        code.setExpireIn(LocalDateTime.now().plusHours(24));
+        code.setType(GeneratingCode.Type.RESET_PASSWORD);
+
+        GeneratingCode c = generatingCodeRepository.save(code);
+
+        mailSenderClient.sendMailConfirm(SendMessageMailConfirmRequest.builder()
+                .subject("SocShared - Подтвердите электронную почту")
+                .username(user.getUsername())
+                .toEmail(user.getEmail())
+                .link(mainHost + "account/" + c.getGeneratingLink())
+                .build(), "Bearer " + token.getToken());
+
+        return new SuccessResponse(true);
     }
 }

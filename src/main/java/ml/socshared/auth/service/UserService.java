@@ -7,6 +7,7 @@ import ml.socshared.auth.domain.request.UpdatePasswordRequest;
 import ml.socshared.auth.domain.request.UpdateUserRequest;
 import ml.socshared.auth.domain.response.SuccessResponse;
 import ml.socshared.auth.domain.response.UserResponse;
+import ml.socshared.auth.entity.GeneratingCode;
 import org.springframework.data.domain.Page;
 
 import java.util.UUID;
@@ -26,6 +27,7 @@ public interface UserService {
     SuccessResponse checkData(AuthRequest request);
     UserResponse addRole(UUID id, UUID roleId);
     UserResponse removeRole(UUID id, UUID roleId);
-    SuccessResponse confirmEmail(String generatingLink);
+    GeneratingCode processGenerationLink(String generatingLink);
+    SuccessResponse resetPassword(String email);
 
 }
