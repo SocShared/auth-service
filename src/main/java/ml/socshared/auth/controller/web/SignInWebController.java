@@ -44,10 +44,9 @@ public class SignInWebController {
     }
 
     @GetMapping("/signin")
-    public String showSignInForm(@RequestParam(name = "client_id", required = false) UUID clientId, @RequestParam(name = "response_type", required = false) String responseType,
-                                 @RequestParam(name = "state", required = false) String state, @RequestParam(name = "redirect_uri", required = false) String redirectUri,
-                                 @CookieValue(value = "JWT_AT", defaultValue = "") String jwtToken, @CookieValue(value = "JWT_RT", defaultValue = "") String rtToken,
-                                 HttpServletResponse response) {
+    public String showSignInForm(@CookieValue(value = "JWT_AT", defaultValue = "") String jwtToken,
+                                 @CookieValue(value = "JWT_RT", defaultValue = "") String rtToken,
+                                 HttpServletResponse response, Model model) {
         if (jwtToken.isEmpty())
             return "signin";
         else if (!provider.validateAccessToken(jwtToken)) {
@@ -60,30 +59,16 @@ public class SignInWebController {
                 req.setGrantType(TypeFlow.REFRESH_TOKEN);
                 req.setRefreshToken(rtToken);
                 OAuth2TokenResponse res = oAuthService.getTokenByRefreshToken(req);
-                Cookie accessToken = new Cookie("JWT_AT", res.getAccessToken());
-                accessToken.setMaxAge(24 * 60 * 60);
-                accessToken.setSecure(true);
-                accessToken.setHttpOnly(true);
-                accessToken.setPath("/");
-                accessToken.setDomain("socshared.ml");
-                response.addCookie(accessToken);
-
-                Cookie refreshToken = new Cookie("JWT_RT", res.getRefreshToken());
-                refreshToken.setMaxAge(24 * 60 * 60 * 30);
-                refreshToken.setSecure(true);
-                refreshToken.setHttpOnly(true);
-                refreshToken.setPath("/");
-                refreshToken.setDomain("socshared.ml");
-                response.addCookie(refreshToken);
-                if (clientId != null && responseType != null && state != null && redirectUri != null)
-                    return "redirect:"+String.format("/oauth/authorize?client_id=%s&response_type=%s&state=%s&redirect_uri=%s", clientId, responseType, state, redirectUri);
+                setCookies(response, res.getAccessToken(), res.getRefreshToken());
             }
         }
         return "redirect:https://socshared.ml/social";
     }
 
     @PostMapping("/signin")
-    public String signIn(@Valid @ModelAttribute("user") AuthRequest request, BindingResult bindingResult, HttpServletResponse response) {
+    public String signIn(@RequestParam(name = "client_id", required = false) UUID clientId, @RequestParam(name = "response_type", required = false) String responseType,
+                         @RequestParam(name = "state", required = false) String state, @RequestParam(name = "redirect_uri", required = false) String redirectUri,
+                         @Valid @ModelAttribute("user") AuthRequest request, BindingResult bindingResult, HttpServletResponse response) {
         if (bindingResult.hasErrors())
             return "signin";
         OAuthFlowRequest req = new OAuthFlowRequest();
@@ -95,28 +80,33 @@ public class SignInWebController {
 
         try {
             OAuth2TokenResponse token = oAuthService.getTokenByUsernameAndPassword(req);
-            Cookie accessToken = new Cookie("JWT_AT", token.getAccessToken());
-            accessToken.setMaxAge(24 * 60 * 60);
-            accessToken.setSecure(true);
-            accessToken.setHttpOnly(true);
-            accessToken.setPath("/");
-            accessToken.setDomain("socshared.ml");
-            response.addCookie(accessToken);
-
-            Cookie refreshToken = new Cookie("JWT_RT", token.getRefreshToken());
-            refreshToken.setMaxAge(24 * 60 * 60 * 30);
-            refreshToken.setSecure(true);
-            refreshToken.setHttpOnly(true);
-            refreshToken.setPath("/");
-            refreshToken.setDomain("socshared.ml");
-            response.addCookie(refreshToken);
+            setCookies(response, token.getAccessToken(), token.getRefreshToken());
         } catch (AuthenticationException exc) {
             bindingResult.addError(new FieldError("user", "password", "Неверный логин или пароль"));
             if (bindingResult.hasErrors()) {
                 return "signin";
             }
         }
+        if (clientId != null && responseType != null && state != null && redirectUri != null)
+            return "redirect:" + String.format("/oauth/authorize?client_id=%s&response_type=%s&state=%s&redirect_uri=%s", clientId, responseType, state, redirectUri);
         return "redirect:https://socshared.ml/social";
     }
 
+    public void setCookies(HttpServletResponse response, String accessToken, String refreshToken) {
+        Cookie accessTokenCookie = new Cookie("JWT_AT", accessToken);
+        accessTokenCookie.setMaxAge(24 * 60 * 60);
+        accessTokenCookie.setSecure(true);
+        accessTokenCookie.setHttpOnly(true);
+        accessTokenCookie.setPath("/");
+        accessTokenCookie.setDomain("socshared.ml");
+        response.addCookie(accessTokenCookie);
+
+        Cookie refreshTokenCookie = new Cookie("JWT_RT", refreshToken);
+        refreshTokenCookie.setMaxAge(24 * 60 * 60 * 30);
+        refreshTokenCookie.setSecure(true);
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setDomain("socshared.ml");
+        response.addCookie(refreshTokenCookie);
+    }
 }

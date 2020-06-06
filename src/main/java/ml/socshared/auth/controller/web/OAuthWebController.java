@@ -1,6 +1,7 @@
 package ml.socshared.auth.controller.web;
 
 import lombok.RequiredArgsConstructor;
+import ml.socshared.auth.domain.request.AuthRequest;
 import ml.socshared.auth.domain.response.ClientResponse;
 import ml.socshared.auth.domain.response.UserResponse;
 import ml.socshared.auth.entity.AuthorizationCode;
@@ -11,10 +12,7 @@ import ml.socshared.auth.service.jwt.JwtTokenProvider;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
@@ -30,6 +28,11 @@ public class OAuthWebController {
     private final UserService userService;
     private final ClientService clientService;
     private final JwtTokenProvider provider;
+
+    @ModelAttribute("user")
+    public AuthRequest getAuthRequest() {
+        return new AuthRequest();
+    }
 
     @GetMapping("/oauth/authorize")
     public String authorizedCode(@RequestParam(name = "client_id") UUID clientId, @RequestParam(name = "response_type") String responseType,
@@ -52,7 +55,11 @@ public class OAuthWebController {
                 model.addAttribute("state", state);
                 return "proof_rights";
             } else {
-                return "redirect:"+String.format("/signin?client_id=%s&response_type=%s&state=%s&redirect_uri=%s", clientId, responseType, state, redirectUri);
+                model.addAttribute("client_id", clientId);
+                model.addAttribute("response_type", responseType);
+                model.addAttribute("state", state);
+                model.addAttribute("redirect_uri", redirectUri);
+                return "signin";
             }
         }
         return "redirect:https://socshared.ml";

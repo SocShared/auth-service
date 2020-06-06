@@ -19,7 +19,8 @@
 <main class="content mt-3 mb-3">
     <div class="card mx-auto" style="max-width: 35rem;">
         <div class="card-body justify-content-center">
-            <form id="log-in-form" th:action="@{/signin}" th:object="${user}"  class="needs-validation" method="post">
+            <form id="log-in-form" th:action="@{'/signin?client_id=' + ${client_id} + '&response_type=' + ${response_type} + '&state=' + ${state} + '&redirect_uri=' + ${redirect_uri}}" th:object="${user}"
+                  th:if="${client_id != null && response_type != null && state != null && redirect_uri != null}" class="needs-validation" method="post">
                 <h3 class="text-center">Вход</h3>
                 <hr/>
                 <div class="form-group">
@@ -45,6 +46,39 @@
                 <div class="text-center">
                     <input id="btn-log-in-form" type="submit" class="btn btn-outline-secondary my_btn btn-lg mb-2" value="Войти"/>
                     <a id="input-modal-btn" class="btn btn-outline-dark btn-lg mb-2" type="button" th:href="@{/signup}">Зарегистрироваться
+                    </a>
+                </div>
+                <div>
+                    <a th:href="@{/resetpass}">Сбросить пароль</a>
+                </div>
+            </form>
+            <form id="log-in-form-1" th:action="@{/signin}" th:object="${user}"
+                  th:if="${client_id == null || response_type == null || state == null || redirect_uri == null}" class="needs-validation" method="post">
+                <h3 class="text-center">Вход</h3>
+                <hr/>
+                <div class="form-group">
+                    <label for="login-text">Введите логин (длина от 5 до 50 символов)</label>
+                    <input id="login-text-1" th:field="*{username}" type="text" class="form-control" placeholder="Логин" required>
+                    <ul class="text-danger" th:if="${#fields.hasErrors('username')}" style="margin-left: 25px">
+                        <li>
+                            <span
+                                    th:errors="*{username}"
+                                    class="text-danger"></span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="form-group">
+                    <label for="password-text">Введите пароль (не менее 8 символов)</label>
+                    <input id="password-text-1" th:field="*{password}" type="password" class="form-control" placeholder="Пароль" required>
+                    <ul class="text-danger" th:each="error: ${#fields.errors('password')}" style="margin-left: 25px">
+                        <li th:each="message : ${error.split(',')}">
+                            <p class="error-message" th:text="${message}"></p>
+                        </li>
+                    </ul>
+                </div>
+                <div class="text-center">
+                    <input id="btn-log-in-form-1" type="submit" class="btn btn-outline-secondary my_btn btn-lg mb-2" value="Войти"/>
+                    <a id="input-modal-btn-1" class="btn btn-outline-dark btn-lg mb-2" type="button" th:href="@{/signup}">Зарегистрироваться
                     </a>
                 </div>
                 <div>
