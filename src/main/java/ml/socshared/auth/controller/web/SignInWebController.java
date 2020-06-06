@@ -186,8 +186,6 @@ public class SignInWebController {
         if (bindingResult.hasErrors())
             return "set_password";
 
-        System.out.println(request);
-
         if (!request.getPassword().equals(request.getRepeatPassword())) {
             bindingResult.addError(new ObjectError("email", "Введенный email не найден."));
             if (bindingResult.hasErrors()) {

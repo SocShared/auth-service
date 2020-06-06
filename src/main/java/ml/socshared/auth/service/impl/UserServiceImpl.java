@@ -134,7 +134,7 @@ public class UserServiceImpl implements UserService {
                 () -> new HttpNotFoundException("Not found user by id: " + id)
         );
 
-        user.setPassword(request.getPassword());
+        user.setPassword(Hashing.sha256().hashString(request.getPassword(), StandardCharsets.UTF_8).toString());
         user.setResetPassword(false);
         user = userRepository.save(user);
 
