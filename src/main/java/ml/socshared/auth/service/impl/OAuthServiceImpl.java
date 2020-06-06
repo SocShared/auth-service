@@ -7,11 +7,13 @@ import ml.socshared.auth.domain.request.AuthRequest;
 import ml.socshared.auth.domain.request.CheckTokenRequest;
 import ml.socshared.auth.domain.request.ClientCredentialsRequest;
 import ml.socshared.auth.domain.response.SuccessResponse;
+import ml.socshared.auth.entity.AuthorizationCode;
 import ml.socshared.auth.entity.Client;
 import ml.socshared.auth.entity.User;
 import ml.socshared.auth.exception.impl.AuthenticationException;
 import ml.socshared.auth.repository.ClientRepository;
 import ml.socshared.auth.repository.UserRepository;
+import ml.socshared.auth.service.AuthorizationCodeService;
 import ml.socshared.auth.service.ClientService;
 import ml.socshared.auth.service.UserService;
 import ml.socshared.auth.service.jwt.JwtTokenProvider;
@@ -33,6 +35,7 @@ public class OAuthServiceImpl implements OAuthService {
     private final UserRepository userRepository;
     private final ClientRepository clientRepository;
     private final ClientService clientService;
+    private final AuthorizationCodeService authorizationCodeService;
 
     @Override
     public OAuth2TokenResponse getTokenByUsernameAndPassword(OAuthFlowRequest request) throws AuthenticationException {
@@ -67,7 +70,7 @@ public class OAuthServiceImpl implements OAuthService {
         if (client.getAccessType() == Client.AccessType.PUBLIC) {
             if (userService.checkData(authRequest).getSuccess()) {
                 User user = userRepository.findByUsername(request.getUsername()).orElse(new User());
-                response = jwtTokenProvider.createTokenByUsernameAndPassword(user, client);
+                response = jwtTokenProvider.createTokenByUserAndClient(user, client);
             }
         }
 
@@ -117,7 +120,38 @@ public class OAuthServiceImpl implements OAuthService {
 
     @Override
     public OAuth2TokenResponse getTokenByAuthorizationCode(OAuthFlowRequest request) {
-        return null;
+        log.info("getting token by authorization code grant type");
+
+        if (request.getClientId() == null)
+            throw new AuthenticationException("client_id is invalid");
+
+        if (request.getClientSecret() == null)
+            throw new AuthenticationException("client_secret is invalid");
+
+        ClientCredentialsRequest clientCredentialsRequest = ClientCredentialsRequest.builder()
+                .clientId(request.getClientId())
+                .clientSecret(request.getClientSecret())
+                .build();
+
+        Client client = clientRepository.findById(UUID.fromString(request.getClientId())).orElseThrow(
+                () -> new AuthenticationException("client_id invalid")
+        );
+
+        if ((client.getAccessType() == Client.AccessType.CONFIDENTIAL
+                && !clientService.checkData(clientCredentialsRequest).getSuccess())) {
+            log.warn("request -> {}", request);
+            throw new AuthenticationException("Authentication failed");
+        }
+
+        AuthorizationCode authorizationCode = authorizationCodeService.findById(request.getCode());
+
+        if (authorizationCode != null && authorizationCode.getRedirectUri().equals(request.getRedirectUri())
+                && authorizationCodeService.validateCode(request.getCode())) {
+            return jwtTokenProvider.createTokenByUserAndClient(
+                    userRepository.findById(authorizationCode.getUserId()).orElse(new User()), client);
+        }
+
+        throw new AuthenticationException("Authentication failed");
     }
 
     @Override
@@ -162,5 +196,10 @@ public class OAuthServiceImpl implements OAuthService {
         successResponse.setSuccess(jwtTokenProvider.validateAccessToken(request.getToken()));
 
         return successResponse;
+    }
+
+    @Override
+    public AuthorizationCode getAuthorizationCode(UUID userId, UUID clientId, String redirectUri) {
+        return authorizationCodeService.generationCode(userId, clientId, redirectUri);
     }
 }

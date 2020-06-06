@@ -43,7 +43,7 @@ public class JwtTokenProvider {
     private final SocsharedServiceRepository socsharedServiceRepository;
     private final ServiceTokenRepository serviceTokenRepository;
 
-    public OAuth2TokenResponse createTokenByUsernameAndPassword(User user, Client client) {
+    public OAuth2TokenResponse createTokenByUserAndClient(User user, Client client) {
         Session session = createSession(client, user);
 
         Claims claimsAccess = JwtClaimsBuilder.buildJwtClaimsByUserClientSession(user, client, session);

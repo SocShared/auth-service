@@ -18,6 +18,8 @@ public class OAuthFlowRequest {
     private String username;
     private String password;
     private String refreshToken;
+    private String code;
+    private String redirectUri;
 
     @NotNull
     private TypeFlow grantType;

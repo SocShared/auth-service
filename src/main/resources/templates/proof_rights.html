@@ -1,0 +1,50 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta content="text/html;charset=UTF-8">
+    <title>Tasks</title>
+    <link th:href="@{/css/bootstrap.css}" rel="stylesheet"/>
+    <link th:href="@{/css/bootstrap-grid.css}" rel="stylesheet"/>
+    <link th:href="@{/css/bootstrap-reboot.css}" rel="stylesheet"/>
+    <link th:href="@{/css/style.css}" rel="stylesheet"/>
+    <link th:href="@{/css/progress.css}" rel="stylesheet"/>
+    <script th:src="@{/js/jquery-3.4.1.min.js}"></script>
+    <script th:src="@{/js/bootstrap.bundle.js}"></script>
+    <script th:src="@{/js/bootstrap.js}"></script>
+    <script th:src="@{/js/md5.js}"></script>
+</head>
+<body>
+<header>
+
+</header>
+
+<main class="content mt-3 mb-3">
+    <div class="container p-lg-5">
+        <div class="card mx-auto" style="max-width: 35rem;">
+            <div class="card-body justify-content-center">
+                <h3 class="text-center">Подвтерждение прав</h3>
+                <hr/>
+                <div class="form-group">
+                    <h5 th:text="${'Приложение ' + client.getName() + ' запрашивает права'}"></h5>
+                    <hr/>
+                    <h6 th:text="${'Имя пользователя: ' + user.username}"></h6>
+                    <h6 th:if="${user.email != null}" th:text="${'Email: ' + user.email}"></h6>
+                </div>
+                <div class="text-center">
+                    <a id="btn-proof" type="submit" class="btn btn-success" th:href="${redirect_uri + '?code=' + code + '&state=' + state}">
+                        Подтвердить права
+                    </a>
+                    <a id="btn-cancel" class="btn btn-warning" href="https://socshared.ml">
+                        Отменить
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="footer bg-secondary mt-3">
+    <div class="footer-copyright text-center py-3 text-light">© 2020 Copyright: SocShared</div>
+</footer>
+
+</body>
+</html>
