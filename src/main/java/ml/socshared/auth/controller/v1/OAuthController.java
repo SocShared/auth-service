@@ -1,6 +1,7 @@
 package ml.socshared.auth.controller.v1;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ml.socshared.auth.domain.request.CheckTokenRequest;
 import ml.socshared.auth.domain.request.oauth.OAuthFlowRequest;
 import ml.socshared.auth.domain.response.SuccessResponse;
@@ -16,12 +17,14 @@ import javax.validation.Valid;
 @RestController
 @RequiredArgsConstructor
 @Validated
+@Slf4j
 public class OAuthController {
 
     private final OAuthService oAuthService;
 
     @RequestMapping(value = "/oauth/token", method = RequestMethod.POST,consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public @ResponseBody OAuth2TokenResponse getTokenByForm(@Valid OAuthFlowRequest oAuthFlowRequest) {
+    public @ResponseBody OAuth2TokenResponse getTokenByForm(OAuthFlowRequest oAuthFlowRequest) {
+        log.info(oAuthFlowRequest.toString());
         return getToken(oAuthFlowRequest);
     }
 
