@@ -9,10 +9,7 @@ import ml.socshared.auth.domain.response.OAuth2TokenResponse;
 import ml.socshared.auth.exception.impl.OAuth2Exception;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -23,9 +20,8 @@ public class OAuthController {
 
     private final OAuthService oAuthService;
 
-    @PostMapping(value = "/oauth/token", produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public OAuth2TokenResponse getTokenByForm(@Valid OAuthFlowRequest oAuthFlowRequest) {
+    @RequestMapping(value = "/oauth/token", method = RequestMethod.POST,consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public @ResponseBody OAuth2TokenResponse getTokenByForm(@Valid OAuthFlowRequest oAuthFlowRequest) {
         return getToken(oAuthFlowRequest);
     }
 
