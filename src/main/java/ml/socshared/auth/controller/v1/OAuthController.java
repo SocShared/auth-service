@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,10 +23,9 @@ public class OAuthController {
 
     private final OAuthService oAuthService;
 
-    @RequestMapping(value = "/oauth/token", method = RequestMethod.POST,consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public @ResponseBody OAuth2TokenResponse getTokenByForm(@RequestBody OAuthFlowRequest oAuthFlowRequest) {
-        log.info(oAuthFlowRequest.toString());
-        return getToken(oAuthFlowRequest);
+    @PostMapping(value = "/oauth/token", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public OAuth2TokenResponse getTokenByForm(@RequestParam Map<String, String> oAuthFlowRequest) {
+        return getToken(OAuthFlowRequest.fromMap(oAuthFlowRequest));
     }
 
     @PostMapping(value = "/oauth/token", consumes = MediaType.APPLICATION_JSON_VALUE,

@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -33,4 +34,17 @@ public class OAuthFlowRequest {
     @JsonProperty("grant_type")
     private TypeFlow grantType;
 
+    public static OAuthFlowRequest fromMap(Map<String, String> map) {
+        OAuthFlowRequest request = new OAuthFlowRequest();
+        request.setClientId(map.get("client_id"));
+        request.setClientSecret(map.get("client_secret"));
+        request.setRefreshToken(map.get("refresh_token"));
+        request.setUsername(map.get("username"));
+        request.setPassword(map.get("password"));
+        request.setGrantType(TypeFlow.valueOf(map.get("grant_type").toUpperCase()));
+        request.setCode(map.get("code"));
+        request.setRedirectUri(map.get("redirect_uri"));
+
+        return request;
+    }
 }
