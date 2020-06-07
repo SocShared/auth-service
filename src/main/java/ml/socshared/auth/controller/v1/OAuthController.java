@@ -23,7 +23,7 @@ public class OAuthController {
     private final OAuthService oAuthService;
 
     @RequestMapping(value = "/oauth/token", method = RequestMethod.POST,consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public @ResponseBody OAuth2TokenResponse getTokenByForm(OAuthFlowRequest oAuthFlowRequest) {
+    public @ResponseBody OAuth2TokenResponse getTokenByForm(@RequestBody OAuthFlowRequest oAuthFlowRequest) {
         log.info(oAuthFlowRequest.toString());
         return getToken(oAuthFlowRequest);
     }
