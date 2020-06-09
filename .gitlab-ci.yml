@@ -11,9 +11,7 @@ before_script:
 
 build:
   stage: build
-  script:
-    - docker 2>/dev/null 1>&2 rmi `docker images -aq` || true
-    - ./gradlew clean build
+  script: ./gradlew clean build
   artifacts:
     paths:
       - build/libs/socshared-auth-service-1.0.0-SNAPSHOT.jar
@@ -21,6 +19,7 @@ build:
 docker-build:
   stage: docker-build
   script:
+    - docker 2>/dev/null 1>&2 rmi `docker images -aq` || true
     - docker build -t $CI_DOCKER_LOGIN/socshared-auth-service .
 
 docker-push:
