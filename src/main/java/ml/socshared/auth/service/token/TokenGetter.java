@@ -1,5 +1,6 @@
 package ml.socshared.auth.service.token;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ml.socshared.auth.domain.model.TokenObject;
@@ -31,7 +32,7 @@ public class TokenGetter {
     }
 
     @Before("execution(* ml.socshared.auth.service.impl.*.*(..))")
-    public TokenObject getTokenMail() {
+    public TokenObject initTokenMail() {
         if (tokenMail.getToken() != null && jwtTokenProvider.validateServiceToken(tokenMail.getToken())) {
             return tokenMail;
         }
@@ -43,6 +44,10 @@ public class TokenGetter {
 
         this.tokenMail.setToken(jwtTokenProvider.buildServiceToken(request).getToken());
 
+        return tokenMail;
+    }
+
+    public TokenObject getTokenMail() {
         return tokenMail;
     }
 
