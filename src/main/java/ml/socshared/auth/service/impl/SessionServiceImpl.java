@@ -46,8 +46,10 @@ public class SessionServiceImpl implements SessionService {
 
     @Scheduled(fixedDelay = 120000)
     public void analyzeStatistic() {
-        Integer online = sessionRepository.countOnline(new Date().getTime());
-        Integer active = sessionRepository.activeUsers(new Date().getTime());
+        long time = new Date().getTime();
+        log.info("time long -> {}", time);
+        Integer online = sessionRepository.countOnline(time);
+        Integer active = sessionRepository.activeUsers(time);
         Map<String, Object> additionalData = new HashMap<>();
         additionalData.put("online", online);
         sentrySender.sentryMessage("online = " + online, additionalData, Collections.singletonList(SentryTag.ONLINE_USERS));
