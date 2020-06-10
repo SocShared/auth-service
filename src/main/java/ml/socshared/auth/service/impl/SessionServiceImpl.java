@@ -60,9 +60,9 @@ public class SessionServiceImpl implements SessionService {
         additionalData = new HashMap<>();
         additionalData.put("active_users", active);
         additionalData.put("new_users", newUsers);
-        additionalData.put("all_users", newUsers);
+        additionalData.put("all_users", allUsers);
 
-        sentrySender.sentryMessage("metrics users = " + allUsers, additionalData, Collections.singletonList(SentryTag.METRICS_USERS));
+        sentrySender.sentryMessage("metrics users", additionalData, Collections.singletonList(SentryTag.METRICS_USERS));
     }
 
 }
