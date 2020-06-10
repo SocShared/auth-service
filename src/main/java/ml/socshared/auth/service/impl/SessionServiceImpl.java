@@ -5,9 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import ml.socshared.auth.service.SessionService;
 import ml.socshared.auth.entity.Session;
 import ml.socshared.auth.repository.SessionRepository;
+import ml.socshared.auth.service.sentry.SentrySender;
+import ml.socshared.auth.service.sentry.SentryTag;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +18,7 @@ import java.util.UUID;
 public class SessionServiceImpl implements SessionService {
 
     private final SessionRepository sessionRepository;
+    private final SentrySender sentrySender;
 
     @Override
     public Session findByClientIdAndUserId(UUID clientId, UUID userId) {
@@ -40,5 +44,16 @@ public class SessionServiceImpl implements SessionService {
         sessionRepository.deleteById(sessionId);
     }
 
+    @Scheduled(fixedDelay = 120000)
+    public void analyzeStatistic() {
+        Integer online = sessionRepository.countOnline(new Date().getTime());
+        Integer active = sessionRepository.activeUsers(new Date().getTime());
+        Map<String, Object> additionalData = new HashMap<>();
+        additionalData.put("online", online);
+        sentrySender.sentryMessage("online = " + online, additionalData, Collections.singletonList(SentryTag.ONLINE_USERS));
+        additionalData = new HashMap<>();
+        additionalData.put("active", active);
+        sentrySender.sentryMessage("active = " + active, additionalData, Collections.singletonList(SentryTag.ACTIVE_USERS));
+    }
 
 }

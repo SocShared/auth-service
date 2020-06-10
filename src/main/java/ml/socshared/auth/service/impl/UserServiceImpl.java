@@ -21,6 +21,8 @@ import ml.socshared.auth.repository.GeneratingCodeRepository;
 import ml.socshared.auth.repository.UserRepository;
 import ml.socshared.auth.repository.RoleRepository;
 import ml.socshared.auth.service.UserService;
+import ml.socshared.auth.service.sentry.SentrySender;
+import ml.socshared.auth.service.sentry.SentryTag;
 import ml.socshared.auth.util.GeneratorLinks;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -30,9 +32,7 @@ import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Pattern;
 
 @Service
@@ -44,6 +44,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final MailSenderClient mailSenderClient;
+    private final SentrySender sentrySender;
 
     @Value("${main.host}")
     private String mainHost;
@@ -102,7 +103,13 @@ public class UserServiceImpl implements UserService {
                 .link(mainHost + "account/" + c.getGeneratingLink())
                 .build(), "Bearer " + token.getToken());
 
-        return new UserResponse(u);
+        UserResponse userResponse = new UserResponse(u);
+
+        Map<String, Object> additionalData = new HashMap<>();
+        additionalData.put("user_data", userResponse);
+        sentrySender.sentryMessage("registration user", additionalData, Collections.singletonList(SentryTag.REGISTRATION_USER));
+
+        return userResponse;
     }
 
     @Override
@@ -138,7 +145,13 @@ public class UserServiceImpl implements UserService {
         user.setResetPassword(false);
         user = userRepository.save(user);
 
-        return new UserResponse(user);
+        UserResponse response = new UserResponse(user);
+
+        Map<String, Object> additionalData = new HashMap<>();
+        additionalData.put("user_data", response);
+        sentrySender.sentryMessage("update user password", additionalData, Collections.singletonList(SentryTag.UPDATE_USER_PASSWORD));
+
+        return response;
     }
 
     @Override
@@ -155,35 +168,66 @@ public class UserServiceImpl implements UserService {
         SuccessResponse successResponse = new SuccessResponse();
         successResponse.setSuccess(true);
 
+        Map<String, Object> additionalData = new HashMap<>();
+        additionalData.put("user_id", id);
+        sentrySender.sentryMessage("delete user by id", additionalData, Collections.singletonList(SentryTag.DELETE_USER_BY_ID));
+
         return successResponse;
     }
 
     @Override
     public UserResponse findById(UUID id) {
         log.info("find by id -> {}", id);
-        return new UserResponse(userRepository.findById(id)
+
+        UserResponse userResponse = new UserResponse(userRepository.findById(id)
                 .orElseThrow(() -> new HttpNotFoundException("Not found user by id: " + id)));
+
+        Map<String, Object> additionalData = new HashMap<>();
+        additionalData.put("user_data", userResponse);
+        sentrySender.sentryMessage("get user by id", additionalData, Collections.singletonList(SentryTag.GET_USER_BY_ID));
+
+        return userResponse;
     }
 
     @Override
     public UserResponse findByUsername(String username) {
         log.info("find by username -> {}", username);
-        return new UserResponse(userRepository.findByUsername(username)
+
+        UserResponse userResponse = new UserResponse(userRepository.findByUsername(username)
                 .orElseThrow(() -> new HttpNotFoundException("Not found user by username: " + username)));
+
+        Map<String, Object> additionalData = new HashMap<>();
+        additionalData.put("user_data", userResponse);
+        sentrySender.sentryMessage("get user by username", additionalData, Collections.singletonList(SentryTag.GET_USER_BY_USERNAME));
+
+        return userResponse;
     }
 
     @Override
     public UserResponse findByEmail(String email) {
         log.info("find by email -> {}", email);
-        return new UserResponse(userRepository.findByEmail(email)
+
+        UserResponse userResponse = new UserResponse(userRepository.findByEmail(email)
                 .orElseThrow(() -> new HttpNotFoundException("Not found user by email: " + email)));
+
+        Map<String, Object> additionalData = new HashMap<>();
+        additionalData.put("user_data", userResponse);
+        sentrySender.sentryMessage("get user by email", additionalData, Collections.singletonList(SentryTag.GET_USER_BY_EMAIL));
+
+        return userResponse;
     }
 
     @Override
     public Page<UserModel> findAll(Integer page, Integer size) {
         log.info("find all");
         Pageable pageable = PageRequest.of(page, size);
-        return userRepository.findAllUsers(pageable);
+
+        Page<UserModel> users = userRepository.findAllUsers(pageable);
+
+        Map<String, Object> additionalData = new HashMap<>();
+        sentrySender.sentryMessage("get users", additionalData, Collections.singletonList(SentryTag.GET_USERS));
+
+        return users;
     }
 
     @Override
@@ -215,6 +259,9 @@ public class UserServiceImpl implements UserService {
         SuccessResponse successResponse = new SuccessResponse();
         successResponse.setSuccess(user != null);
 
+        Map<String, Object> additionalData = new HashMap<>();
+        sentrySender.sentryMessage("check username and password", additionalData, Collections.singletonList(SentryTag.CHECK_USERNAME_AND_PASSWORD));
+
         return successResponse;
     }
 
@@ -229,6 +276,11 @@ public class UserServiceImpl implements UserService {
         user.getRoles().add(role);
         user = userRepository.save(user);
 
+        Map<String, Object> additionalData = new HashMap<>();
+        additionalData.put("user_id", id);
+        additionalData.put("role_id", roleId);
+        sentrySender.sentryMessage("add role for user", additionalData, Collections.singletonList(SentryTag.ADD_ROLE_FOR_USER));
+
         return new UserResponse(user);
     }
 
@@ -242,6 +294,11 @@ public class UserServiceImpl implements UserService {
 
         user.getRoles().remove(role);
         user = userRepository.save(user);
+
+        Map<String, Object> additionalData = new HashMap<>();
+        additionalData.put("user_id", id);
+        additionalData.put("role_id", roleId);
+        sentrySender.sentryMessage("remove role for user", additionalData, Collections.singletonList(SentryTag.REMOVE_ROLE_FOR_USER));
 
         return new UserResponse(user);
     }
@@ -291,6 +348,10 @@ public class UserServiceImpl implements UserService {
                 .toEmail(user.getEmail())
                 .link(mainHost + "account/" + c.getGeneratingLink())
                 .build(), "Bearer " + token.getToken());
+
+        Map<String, Object> additionalData = new HashMap<>();
+        additionalData.put("email", email);
+        sentrySender.sentryMessage("reset password", additionalData, Collections.singletonList(SentryTag.RESET_PASSWORD));
 
         return new SuccessResponse(true);
     }

@@ -175,10 +175,8 @@ public class OAuthServiceImpl implements OAuthService {
 
         if (client.getAccessType() == Client.AccessType.BEARER_ONLY && clientService.checkData(clientCredentialsRequest).getSuccess()) {
             OAuth2TokenResponse response = null;
-            if (client.getAccessType() == Client.AccessType.PUBLIC) {
-                if (jwtTokenProvider.validateRefreshToken(request.getRefreshToken())) {
-                    response = jwtTokenProvider.createTokenByRefreshToken(request.getRefreshToken(), client);
-                }
+            if (jwtTokenProvider.validateRefreshToken(request.getRefreshToken())) {
+                response = jwtTokenProvider.createTokenByRefreshToken(request.getRefreshToken(), client);
             }
             return response;
         }
