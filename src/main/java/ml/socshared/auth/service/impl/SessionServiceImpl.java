@@ -57,7 +57,6 @@ public class SessionServiceImpl implements SessionService {
         long allUsers = userRepository.count();
         Map<String, Object> additionalData = new HashMap<>();
         additionalData.put("online_users", online);
-        additionalData = new HashMap<>();
         additionalData.put("active_users", active);
         additionalData.put("new_users", newUsers);
         additionalData.put("all_users", allUsers);
