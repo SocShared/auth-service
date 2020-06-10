@@ -51,10 +51,10 @@ public class SessionServiceImpl implements SessionService {
     public void analyzeStatistic() {
         long time = new Date().getTime();
         log.info("time long -> {}", time);
-        Integer online = sessionRepository.countOnline(time);
-        Integer active = sessionRepository.activeUsers(time);
-        Integer newUsers = userRepository.countByCreatedAtAfter(LocalDateTime.now().minusDays(5));
-        Integer allUsers = userRepository.countAll();
+        long online = sessionRepository.countOnline(time);
+        long active = sessionRepository.activeUsers(time);
+        long newUsers = userRepository.countByCreatedAtAfter(LocalDateTime.now().minusDays(5));
+        long allUsers = userRepository.count();
         Map<String, Object> additionalData = new HashMap<>();
         additionalData.put("online", online);
         sentrySender.sentryMessage("online users = " + online, additionalData, Collections.singletonList(SentryTag.ONLINE_USERS));

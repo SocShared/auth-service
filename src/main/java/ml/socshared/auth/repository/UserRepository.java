@@ -40,7 +40,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Query("select u from User u where u.email = :email and u.password = :password")
     Optional<User> findByEmailAndPassword(@Param("email") String email, @Param("password") String password);
 
-    Integer countByCreatedAtAfter(LocalDateTime localDateTime);
+    long countByCreatedAtAfter(LocalDateTime localDateTime);
 
-    Integer countAll();
 }
