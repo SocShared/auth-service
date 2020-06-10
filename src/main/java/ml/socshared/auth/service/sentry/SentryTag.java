@@ -21,8 +21,10 @@ public enum SentryTag {
     ADD_CLIENT("type", "add_client"),
     UPDATE_CLIENT("type", "update_client"),
     GET_CLIENT_BY_USER("type", "get_client_by_user"),
-    ONLINE_USERS("type", "online"),
-    ACTIVE_USERS("type", "active");
+    ONLINE_USERS("type", "online_users"),
+    ACTIVE_USERS("type", "active_users"),
+    NEW_USERS("type", "new_users"),
+    ALL_USERS("type", "all_users");
 
     SentryTag(String t, String tag) {
         type = t;
