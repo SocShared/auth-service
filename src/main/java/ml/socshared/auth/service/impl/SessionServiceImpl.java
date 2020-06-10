@@ -56,15 +56,13 @@ public class SessionServiceImpl implements SessionService {
         long newUsers = userRepository.countByCreatedAtAfter(LocalDateTime.now().minusDays(5));
         long allUsers = userRepository.count();
         Map<String, Object> additionalData = new HashMap<>();
-        additionalData.put("online", online);
-        sentrySender.sentryMessage("online users = " + online, additionalData, Collections.singletonList(SentryTag.ONLINE_USERS));
+        additionalData.put("online_users", online);
         additionalData = new HashMap<>();
-        additionalData.put("active", active);
-        sentrySender.sentryMessage("active users = " + active, additionalData, Collections.singletonList(SentryTag.ACTIVE_USERS));
+        additionalData.put("active_users", active);
         additionalData.put("new_users", newUsers);
-        sentrySender.sentryMessage("new users = " + newUsers, additionalData, Collections.singletonList(SentryTag.NEW_USERS));
         additionalData.put("all_users", newUsers);
-        sentrySender.sentryMessage("all users = " + allUsers, additionalData, Collections.singletonList(SentryTag.ALL_USERS));
+
+        sentrySender.sentryMessage("metrics users = " + allUsers, additionalData, Collections.singletonList(SentryTag.METRICS_USERS));
     }
 
 }
