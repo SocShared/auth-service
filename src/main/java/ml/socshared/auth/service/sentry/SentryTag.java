@@ -20,6 +20,7 @@ public enum SentryTag {
     GET_TOKEN_BY_CLIENT_CREDENTIALS("type", "get_token_by_client_credentials"),
     ADD_CLIENT("type", "add_client"),
     UPDATE_CLIENT("type", "update_client"),
+    GET_CLIENT_BY_USER("type", "get_client_by_user"),
     ONLINE_USERS("type", "online"),
     ACTIVE_USERS("type", "active");
 
@@ -37,6 +38,6 @@ public enum SentryTag {
 
     private final String sentryTag;
     private final String type;
-    public static final String SERVICE_NAME = "FBS";
+    public static final String SERVICE_NAME = "AS";
 
 }

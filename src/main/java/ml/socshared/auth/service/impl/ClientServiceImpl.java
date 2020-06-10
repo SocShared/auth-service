@@ -16,14 +16,14 @@ import ml.socshared.auth.repository.ClientRepository;
 import ml.socshared.auth.repository.RoleRepository;
 import ml.socshared.auth.repository.UserRepository;
 import ml.socshared.auth.service.ClientService;
+import ml.socshared.auth.service.sentry.SentrySender;
+import ml.socshared.auth.service.sentry.SentryTag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -33,6 +33,7 @@ public class ClientServiceImpl implements ClientService {
     private final ClientRepository clientRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final SentrySender sentrySender;
 
     @Override
     public ClientResponse add(UUID userId, NewClientRequest request) {
@@ -53,7 +54,15 @@ public class ClientServiceImpl implements ClientService {
             client.setRoles(roles);
         }
 
-        return new ClientResponse(clientRepository.save(client));
+        ClientResponse response = new ClientResponse(clientRepository.save(client));
+
+        Map<String, Object> additionalData = new HashMap<>();
+        additionalData.put("user_id", userId);
+        additionalData.put("name_client", response.getName());
+        additionalData.put("client_id", response.getClientId());
+        sentrySender.sentryMessage("add client", additionalData, Collections.singletonList(SentryTag.ADD_CLIENT));
+
+        return response;
     }
 
     @Override
@@ -67,7 +76,15 @@ public class ClientServiceImpl implements ClientService {
         client.setAccessType(request.getAccessType());
         client.setValidRedirectUri(request.getValidRedirectUri());
 
-        return new ClientResponse(clientRepository.save(client));
+        ClientResponse response = new ClientResponse(clientRepository.save(client));
+
+        Map<String, Object> additionalData = new HashMap<>();
+        additionalData.put("user_id", userId);
+        additionalData.put("name_client", response.getName());
+        additionalData.put("client_id", response.getClientId());
+        sentrySender.sentryMessage("update client", additionalData, Collections.singletonList(SentryTag.UPDATE_CLIENT));
+
+        return response;
     }
 
     @Override
@@ -157,6 +174,13 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public Page<ClientModel> findByUserId(UUID userId, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
-        return clientRepository.findByUserId(userId, pageable);
+
+        Page<ClientModel> clients = clientRepository.findByUserId(userId, pageable);
+
+        Map<String, Object> additionalData = new HashMap<>();
+        additionalData.put("user_id", userId);
+        sentrySender.sentryMessage("get clients by user id " + userId, additionalData, Collections.singletonList(SentryTag.GET_CLIENT_BY_USER));
+
+        return clients;
     }
 }
