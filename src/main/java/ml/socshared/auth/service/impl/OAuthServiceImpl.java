@@ -20,9 +20,14 @@ import ml.socshared.auth.service.jwt.JwtTokenProvider;
 import ml.socshared.auth.domain.request.oauth.OAuthFlowRequest;
 import ml.socshared.auth.domain.response.OAuth2TokenResponse;
 import ml.socshared.auth.service.OAuthService;
+import ml.socshared.auth.service.sentry.SentrySender;
+import ml.socshared.auth.service.sentry.SentryTag;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -36,6 +41,7 @@ public class OAuthServiceImpl implements OAuthService {
     private final ClientRepository clientRepository;
     private final ClientService clientService;
     private final AuthorizationCodeService authorizationCodeService;
+    private final SentrySender sentrySender;
 
     @Override
     public OAuth2TokenResponse getTokenByUsernameAndPassword(OAuthFlowRequest request) throws AuthenticationException {
@@ -80,6 +86,9 @@ public class OAuthServiceImpl implements OAuthService {
             throw new AuthenticationException("Authentication failed");
         }
 
+        Map<String, Object> additionalData = new HashMap<>();
+        sentrySender.sentryMessage("get token by username and password", additionalData, Collections.singletonList(SentryTag.GET_TOKEN_BY_USERNAME_AND_PASSWORD));
+
         return response;
     }
 
@@ -115,6 +124,9 @@ public class OAuthServiceImpl implements OAuthService {
             throw new AuthenticationException("Authentication failed");
         }
 
+        Map<String, Object> additionalData = new HashMap<>();
+        sentrySender.sentryMessage("get token by refresh token", additionalData, Collections.singletonList(SentryTag.GET_TOKEN_BY_REFRESH_TOKEN));
+
         return response;
     }
 
@@ -147,6 +159,10 @@ public class OAuthServiceImpl implements OAuthService {
 
         if (authorizationCode != null && authorizationCode.getRedirectUri().equals(request.getRedirectUri())
                 && authorizationCodeService.validateCode(request.getCode())) {
+
+            Map<String, Object> additionalData = new HashMap<>();
+            sentrySender.sentryMessage("get token by authorization code", additionalData, Collections.singletonList(SentryTag.GET_TOKEN_BY_CLIENT_CREDENTIALS));
+
             return jwtTokenProvider.createTokenByUserAndClient(
                     userRepository.findById(authorizationCode.getUserId()).orElse(new User()), client);
         }
@@ -176,6 +192,9 @@ public class OAuthServiceImpl implements OAuthService {
         if (client.getAccessType() == Client.AccessType.BEARER_ONLY && clientService.checkData(clientCredentialsRequest).getSuccess()) {
             OAuth2TokenResponse response = null;
             if (jwtTokenProvider.validateRefreshToken(request.getRefreshToken())) {
+                Map<String, Object> additionalData = new HashMap<>();
+                sentrySender.sentryMessage("get token by client credentials", additionalData, Collections.singletonList(SentryTag.GET_TOKEN_BY_AUTHORIZATION_CODE));
+
                 response = jwtTokenProvider.createTokenByRefreshToken(request.getRefreshToken(), client);
             }
             return response;
