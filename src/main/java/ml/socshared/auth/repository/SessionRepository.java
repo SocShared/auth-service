@@ -15,10 +15,10 @@ public interface SessionRepository extends JpaRepository<Session, UUID> {
     @Query("select s from Session s where s.client.clientId = :clientId and s.user.userId = :userId")
     Optional<Session> findSessionByClientIdAndUserId(@Param("clientId") UUID clientId, @Param("userId") UUID userId);
 
-    @Query("select count(s) from Session s where s.accessToken.expireIn < :dateLong")
+    @Query("select count(s) from Session s where s.accessToken.expireIn >= :dateLong")
     Integer countOnline(@Param("dateLong") Long dateLong);
 
-    @Query("select count(s) from Session s where s.refreshToken.refreshExpiresIn < :dateLong")
+    @Query("select count(s) from Session s where s.refreshToken.refreshExpiresIn >= :dateLong")
     Integer activeUsers(@Param("dateLong") Long dateLong);
 
 }
