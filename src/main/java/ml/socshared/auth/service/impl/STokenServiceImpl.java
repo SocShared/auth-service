@@ -13,7 +13,13 @@ import ml.socshared.auth.entity.SocsharedService;
 import ml.socshared.auth.exception.impl.HttpNotFoundException;
 import ml.socshared.auth.repository.SocsharedServiceRepository;
 import ml.socshared.auth.service.jwt.JwtTokenProvider;
+import ml.socshared.auth.service.sentry.SentrySender;
+import ml.socshared.auth.service.sentry.SentryTag;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -23,6 +29,7 @@ public class STokenServiceImpl implements STokenService {
     private final JwtTokenProvider jwtTokenProvider;
     private final SocsharedServiceRepository serviceRepository;
     private final ServiceTokenRepository serviceTokenRepository;
+    private final SentrySender sentrySender;
 
     @Override
     public ServiceTokenResponse getToken(ServiceTokenRequest request) {
@@ -45,6 +52,11 @@ public class STokenServiceImpl implements STokenService {
                 .ifPresent(token -> serviceTokenRepository.deleteById(token.getTokenId()));
 
         serviceTokenRepository.save(serviceToken);
+
+        Map<String, Object> additionalData = new HashMap<>();
+        additionalData.put("from_service_id", request.getFromServiceId());
+        additionalData.put("to_service_id", request.getToSecretService());
+        sentrySender.sentryMessage("get service token", additionalData, Collections.singletonList(SentryTag.GET_SERVICE_TOKEN));
 
         return serviceTokenResponse;
     }

@@ -13,7 +13,7 @@ public enum SentryTag {
     ADD_ROLE_FOR_USER("type", "add_role_for_user"),
     REMOVE_ROLE_FOR_USER("type", "remove_role_for_user"),
     RESET_PASSWORD("type", "reset_password"),
-    GET_SERVICE_TOKEN_RESPONSE("type", "get_service_token_response"),
+    GET_SERVICE_TOKEN("type", "get_service_token_response"),
     GET_TOKEN_BY_USERNAME_AND_PASSWORD("type", "get_token_by_username_and_password"),
     GET_TOKEN_BY_REFRESH_TOKEN("type", "get_token_by_refresh_token"),
     GET_TOKEN_BY_AUTHORIZATION_CODE("type", "get_token_by_authorization_code"),
