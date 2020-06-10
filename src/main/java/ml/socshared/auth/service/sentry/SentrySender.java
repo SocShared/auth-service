@@ -19,6 +19,7 @@ public class SentrySender {
         for(SentryTag tag : tags) {
             tm.put(tag.type(), tag.value());
         }
+        tm.put("server_name", "socshared");
         sentry.logMessage(message, tm, additionalData);
     }
 }
