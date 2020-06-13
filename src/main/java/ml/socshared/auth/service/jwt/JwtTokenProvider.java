@@ -261,8 +261,8 @@ public class JwtTokenProvider {
 
             ServiceToken serviceToken = serviceTokenRepository.findByToServiceIdAndFromServiceId(toService, fromService).orElse(null);
 
-            return isPresentToServiceId && isPresentFromServiceId && serviceToken != null;
-
+            return isPresentToServiceId && isPresentFromServiceId && serviceToken != null
+                    && serviceToken.getToken().equals(token);
         } catch (JwtException | IllegalArgumentException exc) {
             if (exc instanceof ExpiredJwtException) {
                 log.warn("JWT Token is expired.");

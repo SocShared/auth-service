@@ -23,10 +23,10 @@ public class AuthorizationCode extends BaseEntity {
     @Column(name = "code", nullable = false)
     private String generatingLink;
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id", nullable = false, unique = true)
     private UUID userId;
 
-    @Column(name = "client_id", nullable = false)
+    @Column(name = "client_id", nullable = false, unique = true)
     private UUID clientId;
 
     @Column(name = "redirect_uri", nullable = false)
