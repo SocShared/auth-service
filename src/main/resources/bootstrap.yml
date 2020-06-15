@@ -5,7 +5,7 @@ server:
       enabled: false
 spring:
   application:
-    name: socshared-auth-service
+    name: auth
   profiles:
     active: ${SPRING_PROFILE:local}
 
