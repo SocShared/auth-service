@@ -11,6 +11,7 @@ import ml.socshared.auth.entity.AuthorizationCode;
 import ml.socshared.auth.entity.Client;
 import ml.socshared.auth.entity.User;
 import ml.socshared.auth.exception.impl.AuthenticationException;
+import ml.socshared.auth.exception.impl.HttpNotFoundException;
 import ml.socshared.auth.repository.ClientRepository;
 import ml.socshared.auth.repository.UserRepository;
 import ml.socshared.auth.service.AuthorizationCodeService;
@@ -25,6 +26,7 @@ import ml.socshared.auth.service.sentry.SentryTag;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -211,6 +213,14 @@ public class OAuthServiceImpl implements OAuthService {
 
         SuccessResponse successResponse = new SuccessResponse();
         successResponse.setSuccess(jwtTokenProvider.validateAccessToken(request.getToken()));
+
+        if (successResponse.getSuccess()) {
+            UUID userId = jwtTokenProvider.getUserIdByToken(request.getToken());
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new HttpNotFoundException("User was not found"));
+            user.setTimeOnline(LocalDateTime.now());
+            userRepository.save(user);
+        }
 
         return successResponse;
     }

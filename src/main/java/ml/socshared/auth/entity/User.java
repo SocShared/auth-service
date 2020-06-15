@@ -1,10 +1,14 @@
 package ml.socshared.auth.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
+import ml.socshared.auth.config.CustomLocalDateTimeSerializer;
 import ml.socshared.auth.entity.base.BaseEntity;
 import ml.socshared.auth.entity.base.Status;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Getter
@@ -43,6 +47,10 @@ public class User extends BaseEntity {
 
     @Column(name = "is_reset_password", nullable = false)
     private Boolean resetPassword;
+
+    @Column(name = "time_online")
+    @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
+    private LocalDateTime timeOnline;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles",
