@@ -59,14 +59,14 @@ public class SessionServiceImpl implements SessionService {
                 .build();
     }
 
-    @Scheduled(fixedDelay = 120000)
+    @Scheduled(fixedDelay = 60000)
     public void analyzeStatistic() {
         long time = new Date().getTime();
         log.info("time long -> {}", time);
         long active = sessionRepository.activeUsers(time);
         long newUsers = userRepository.countByCreatedAtAfter(LocalDateTime.now().minusDays(5));
         long allUsers = userRepository.count();
-        long onlineUsers = userRepository.countByTimeOnlineAfter(LocalDateTime.now().minusMinutes(1));
+        long onlineUsers = userRepository.countByTimeOnlineAfter(LocalDateTime.now().minusSeconds(90));
         Map<String, Object> additionalData = new HashMap<>();
         additionalData.put("active_users", active);
         additionalData.put("new_users", newUsers);
