@@ -179,7 +179,7 @@ public class ClientServiceImpl implements ClientService {
 
         Map<String, Object> additionalData = new HashMap<>();
         additionalData.put("user_id", userId);
-        sentrySender.sentryMessage("get clients by user id " + userId, additionalData, Collections.singletonList(SentryTag.GET_CLIENT_BY_USER));
+        sentrySender.sentryMessage("get clients by user id", additionalData, Collections.singletonList(SentryTag.GET_CLIENT_BY_USER));
 
         return clients;
     }
