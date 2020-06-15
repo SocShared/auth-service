@@ -59,7 +59,7 @@ public class SessionServiceImpl implements SessionService {
                 .build();
     }
 
-    @Scheduled(fixedDelay = 60000)
+    @Scheduled(fixedDelay = 30000)
     public void analyzeStatistic() {
         long time = new Date().getTime();
         log.info("time long -> {}", time);
