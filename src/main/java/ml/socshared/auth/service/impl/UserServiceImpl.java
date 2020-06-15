@@ -7,6 +7,8 @@ import ml.socshared.auth.client.MailSenderClient;
 import ml.socshared.auth.domain.model.TokenObject;
 import ml.socshared.auth.domain.model.UserModel;
 import ml.socshared.auth.domain.request.*;
+import ml.socshared.auth.domain.response.AllUsersResponse;
+import ml.socshared.auth.domain.response.NewUsersResponse;
 import ml.socshared.auth.domain.response.SuccessResponse;
 import ml.socshared.auth.domain.response.UserResponse;
 import ml.socshared.auth.entity.GeneratingCode;
@@ -354,5 +356,23 @@ public class UserServiceImpl implements UserService {
         sentrySender.sentryMessage("reset password", additionalData, Collections.singletonList(SentryTag.RESET_PASSWORD));
 
         return new SuccessResponse(true);
+    }
+
+    @Override
+    public NewUsersResponse newUsers() {
+        Long newUsers = userRepository.countByCreatedAtAfter(LocalDateTime.now().minusDays(5));
+        log.info("new users -> {}", newUsers);
+        return NewUsersResponse.builder()
+                .newUsers(newUsers)
+                .build();
+    }
+
+    @Override
+    public AllUsersResponse allUsers() {
+        Long allUsers = userRepository.count();
+        log.info("new users -> {}", allUsers);
+        return AllUsersResponse.builder()
+                .allUsers(allUsers)
+                .build();
     }
 }

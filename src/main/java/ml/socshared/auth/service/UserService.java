@@ -5,11 +5,14 @@ import ml.socshared.auth.domain.request.AuthRequest;
 import ml.socshared.auth.domain.request.NewUserRequest;
 import ml.socshared.auth.domain.request.UpdatePasswordRequest;
 import ml.socshared.auth.domain.request.UpdateUserRequest;
+import ml.socshared.auth.domain.response.AllUsersResponse;
+import ml.socshared.auth.domain.response.NewUsersResponse;
 import ml.socshared.auth.domain.response.SuccessResponse;
 import ml.socshared.auth.domain.response.UserResponse;
 import ml.socshared.auth.entity.GeneratingCode;
 import org.springframework.data.domain.Page;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public interface UserService {
@@ -29,5 +32,7 @@ public interface UserService {
     UserResponse removeRole(UUID id, UUID roleId);
     GeneratingCode processGenerationLink(String generatingLink);
     SuccessResponse resetPassword(String email);
+    NewUsersResponse newUsers();
+    AllUsersResponse allUsers();
 
 }

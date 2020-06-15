@@ -2,7 +2,7 @@ package ml.socshared.auth.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ml.socshared.auth.config.online.OnlineUsersStore;
+import ml.socshared.auth.domain.response.ActiveUsersResponse;
 import ml.socshared.auth.repository.UserRepository;
 import ml.socshared.auth.service.SessionService;
 import ml.socshared.auth.entity.Session;
@@ -20,10 +20,9 @@ import java.util.*;
 @Slf4j
 public class SessionServiceImpl implements SessionService {
 
-    private final UserRepository userRepository;
     private final SessionRepository sessionRepository;
+    private final UserRepository userRepository;
     private final SentrySender sentrySender;
-    private final OnlineUsersStore onlineUsersStore;
 
     @Override
     public Session findByClientIdAndUserId(UUID clientId, UUID userId) {
@@ -49,6 +48,17 @@ public class SessionServiceImpl implements SessionService {
         sessionRepository.deleteById(sessionId);
     }
 
+    @Override
+    public ActiveUsersResponse activeUsers() {
+        long time = new Date().getTime();
+        log.info("time long -> {}", time);
+        Long active = sessionRepository.activeUsers(time);
+        log.info("active users -> {}", active);
+        return ActiveUsersResponse.builder()
+                .activeUsers(active)
+                .build();
+    }
+
     @Scheduled(fixedDelay = 120000)
     public void analyzeStatistic() {
         long time = new Date().getTime();
@@ -57,12 +67,10 @@ public class SessionServiceImpl implements SessionService {
         long newUsers = userRepository.countByCreatedAtAfter(LocalDateTime.now().minusDays(5));
         long allUsers = userRepository.count();
         Map<String, Object> additionalData = new HashMap<>();
-        additionalData.put("online_users", onlineUsersStore.getUsers().size());
         additionalData.put("active_users", active);
         additionalData.put("new_users", newUsers);
         additionalData.put("all_users", allUsers);
 
         sentrySender.sentryMessage("metrics users", additionalData, Collections.singletonList(SentryTag.METRICS_USERS));
     }
-
 }
