@@ -12,11 +12,19 @@ import java.util.List;
 @Component
 @Getter
 @Setter
-@AllArgsConstructor
 public class LoggedUser implements HttpSessionBindingListener {
 
     private String username;
     private OnlineUsersStore onlineUsersStore;
+
+    public LoggedUser() {
+
+    }
+
+    public LoggedUser(String username, OnlineUsersStore onlineUsersStore) {
+        this.username = username;
+        this.onlineUsersStore = onlineUsersStore;
+    }
 
     @Override
     public void valueBound(HttpSessionBindingEvent event) {
