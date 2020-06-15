@@ -41,5 +41,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByEmailAndPassword(@Param("email") String email, @Param("password") String password);
 
     long countByCreatedAtAfter(LocalDateTime localDateTime);
+    long countByTimeOnlineAfter(LocalDateTime localDateTime);
 
 }
