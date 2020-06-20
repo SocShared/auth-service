@@ -206,6 +206,8 @@ public class JwtTokenProvider {
             String toServiceId = claims.getBody().get("to_service", String.class);
             if (serviceId.equals(toServiceId)) {
                 return validateServiceToken(token);
+            } else {
+                return false;
             }
         } catch (JwtException | IllegalArgumentException exc) {
             if (exc instanceof ExpiredJwtException) {
