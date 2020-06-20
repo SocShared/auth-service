@@ -59,7 +59,7 @@ public class SessionServiceImpl implements SessionService {
                 .build();
     }
 
-    @Scheduled(fixedDelay = 30000)
+    @Scheduled(cron = "30 * * * * *")
     public void onlineUsersStat() {
         long onlineUsers = userRepository.countByTimeOnlineAfter(LocalDateTime.now().minusSeconds(90));
         Map<String, Object> additionalData = new HashMap<>();
@@ -68,7 +68,7 @@ public class SessionServiceImpl implements SessionService {
         sentrySender.sentryMessage("online users", additionalData, Collections.singletonList(SentryTag.ONLINE_USERS));
     }
 
-    @Scheduled(fixedDelay = 86400000)
+    @Scheduled(cron = "0 0 0 * * *")
     public void activeUsersStat() {
         long time = new Date().getTime();
         long active = sessionRepository.activeUsers(time);
@@ -77,7 +77,7 @@ public class SessionServiceImpl implements SessionService {
         sentrySender.sentryMessage("active users", additionalData, Collections.singletonList(SentryTag.ACTIVE_USERS));
     }
 
-    @Scheduled(fixedDelay = 86400000)
+    @Scheduled(cron = "0 0 0 * * *")
     public void newUsersStat() {
         long newUsers = userRepository.countByCreatedAtAfter(LocalDateTime.now().minusDays(5));
         Map<String, Object> additionalData = new HashMap<>();
@@ -86,7 +86,7 @@ public class SessionServiceImpl implements SessionService {
         sentrySender.sentryMessage("new users", additionalData, Collections.singletonList(SentryTag.NEW_USERS));
     }
 
-    @Scheduled(fixedDelay = 86400000)
+    @Scheduled(cron = "0 0 0 * * *")
     public void allUsersStat() {
         long allUsers = userRepository.count();
         Map<String, Object> additionalData = new HashMap<>();
