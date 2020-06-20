@@ -15,7 +15,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @ToString
-@Table(name = "authorization_code")
+@Table(name = "authorization_code", uniqueConstraints={@UniqueConstraint(columnNames={"user_id", "client_id"})})
 @EqualsAndHashCode(callSuper = false)
 public class AuthorizationCode extends BaseEntity {
 
@@ -23,10 +23,10 @@ public class AuthorizationCode extends BaseEntity {
     @Column(name = "code", nullable = false)
     private String generatingLink;
 
-    @Column(name = "user_id", nullable = false, unique = true)
+    @Column(name = "user_id", nullable = false)
     private UUID userId;
 
-    @Column(name = "client_id", nullable = false, unique = true)
+    @Column(name = "client_id", nullable = false)
     private UUID clientId;
 
     @Column(name = "redirect_uri", nullable = false)
