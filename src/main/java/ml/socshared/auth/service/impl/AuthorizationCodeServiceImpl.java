@@ -36,6 +36,9 @@ public class AuthorizationCodeServiceImpl implements AuthorizationCodeService {
     public boolean validateCode(String code) {
         AuthorizationCode authorizationCode = findById(code);
 
+        if (authorizationCode != null)
+            repository.deleteById(authorizationCode.getGeneratingLink());
+
         return authorizationCode != null && !authorizationCode.getExpireIn().isBefore(LocalDateTime.now());
     }
 }
