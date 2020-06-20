@@ -11,6 +11,7 @@ import ml.socshared.auth.entity.Client;
 import ml.socshared.auth.entity.Role;
 import ml.socshared.auth.entity.User;
 import ml.socshared.auth.entity.base.Status;
+import ml.socshared.auth.exception.impl.HttpBadRequestException;
 import ml.socshared.auth.exception.impl.HttpNotFoundException;
 import ml.socshared.auth.repository.ClientRepository;
 import ml.socshared.auth.repository.RoleRepository;
@@ -37,7 +38,13 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public ClientResponse add(UUID userId, NewClientRequest request) {
-        log.info("saving -> {}", request);
+        log.info("add -> {}", request);
+
+        if (request.getAccessType() == Client.AccessType.CONFIDENTIAL || request.getAccessType() == Client.AccessType.PUBLIC) {
+            if (request.getValidRedirectUri() == null || request.getValidRedirectUri().isEmpty()) {
+                throw new HttpBadRequestException("valid redirect uri: " + request.getValidRedirectUri());
+            }
+        }
 
         Client client = new Client();
         client.setAccessType(request.getAccessType());
@@ -67,7 +74,13 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public ClientResponse update(UUID userId, UUID id, NewClientRequest request) {
-        log.info("saving -> {}", request);
+        log.info("update -> {}", request);
+
+        if (request.getAccessType() == Client.AccessType.CONFIDENTIAL || request.getAccessType() == Client.AccessType.PUBLIC) {
+            if (request.getValidRedirectUri() == null || request.getValidRedirectUri().isEmpty()) {
+                throw new HttpBadRequestException("valid redirect uri: " + request.getValidRedirectUri());
+            }
+        }
 
         Client client = clientRepository.findByClientIdAndUserId(UUID.fromString(id.toString()), userId)
                 .orElseThrow(() -> new HttpNotFoundException("Not found client by id: " + id));

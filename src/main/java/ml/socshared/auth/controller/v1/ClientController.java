@@ -20,7 +20,7 @@ import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping(value = "/api/v1", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @RequiredArgsConstructor
 @Validated
 @PreAuthorize("isAuthenticated()")
@@ -29,88 +29,72 @@ public class ClientController {
     private final ClientService clientService;
     private final JwtTokenProvider jwtTokenProvider;
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping(value = "/protected/admin/clients", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('SERVICE')")
+    @GetMapping(value = "/private/clients")
     public Page<ClientModel> findAllClients(@Valid @NotNull @RequestParam(name = "page", required = false) Integer page,
                                             @Valid @NotNull @RequestParam(name = "size", required = false) Integer size) {
         return clientService.findAll(page, size);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping(value = "/protected/admin/clients/{clientId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('SERVICE')")
+    @GetMapping(value = "/private/clients/{clientId}")
     public ClientResponse findByClientId(@PathVariable UUID clientId) {
         return clientService.findById(clientId);
     }
 
-    @PreAuthorize("hasRole('CONTENT_MANAGER')")
-    @GetMapping(value = "/protected/clients/{clientId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ClientResponse findByClientIdAndUserId(@PathVariable UUID clientId, HttpServletRequest servletRequest) {
-        UUID userId = jwtTokenProvider.getUserIdByToken(jwtTokenProvider.resolveToken(servletRequest));
+    @PreAuthorize("hasRole('SERVICE')")
+    @GetMapping(value = "/private/users/{userId}/clients/{clientId}")
+    public ClientResponse findByClientIdAndUserId(@PathVariable UUID userId, @PathVariable UUID clientId) {
         return clientService.findByUserIdAndClientId(userId, clientId);
     }
 
-    @PreAuthorize("hasRole('CONTENT_MANAGER')")
-    @GetMapping(value = "/protected/clients", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Page<ClientModel> findByUserId(@Valid @NotNull @RequestParam(name = "page", required = false) Integer page,
-                                          @Valid @NotNull @RequestParam(name = "size", required = false) Integer size,
-                                          HttpServletRequest servletRequest) {
-        UUID userId = jwtTokenProvider.getUserIdByToken(jwtTokenProvider.resolveToken(servletRequest));
+    @PreAuthorize("hasRole('SERVICE')")
+    @GetMapping(value = "/private/users/{userId}/clients")
+    public Page<ClientModel> findByUserId(@PathVariable UUID userId,
+                                          @Valid @NotNull @RequestParam(name = "page", required = false) Integer page,
+                                          @Valid @NotNull @RequestParam(name = "size", required = false) Integer size) {
         return clientService.findByUserId(userId, page, size);
     }
 
-    @PreAuthorize("hasRole('CONTENT_MANAGER')")
-    @PostMapping(value = "/protected/clients", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ClientResponse addClient(@Valid @RequestBody NewClientRequest request, HttpServletRequest servletRequest) {
-        UUID userId = jwtTokenProvider.getUserIdByToken(jwtTokenProvider.resolveToken(servletRequest));
-
-        if (request.getAccessType() == Client.AccessType.CONFIDENTIAL || request.getAccessType() == Client.AccessType.PUBLIC) {
-            if (request.getValidRedirectUri() == null || request.getValidRedirectUri().isEmpty()) {
-                throw new HttpBadRequestException("valid redirect uri: " + request.getValidRedirectUri());
-            }
-        }
-
+    @PreAuthorize("hasRole('SERVICE')")
+    @PostMapping(value = "/private/users/{userId}/clients")
+    public ClientResponse addClient(@PathVariable UUID userId, @Valid @RequestBody NewClientRequest request) {
         return clientService.add(userId, request);
     }
 
-    @PreAuthorize("hasRole('CONTENT_MANAGER')")
-    @PatchMapping(value = "/protected/clients/{clientId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ClientResponse updateClient(@PathVariable UUID clientId, @Valid @RequestBody NewClientRequest request, HttpServletRequest servletRequest) {
-        UUID userId = jwtTokenProvider.getUserIdByToken(jwtTokenProvider.resolveToken(servletRequest));
-
-        if (request.getAccessType() == Client.AccessType.CONFIDENTIAL || request.getAccessType() == Client.AccessType.PUBLIC) {
-            if (request.getValidRedirectUri() == null || request.getValidRedirectUri().isEmpty()) {
-                throw new HttpBadRequestException("valid redirect uri: " + request.getValidRedirectUri());
-            }
-        }
+    @PreAuthorize("hasRole('SERVICE')")
+    @PatchMapping(value = "/private/users/{userId}/clients/{clientId}")
+    public ClientResponse updateClient(@PathVariable UUID userId, @PathVariable UUID clientId,
+                                       @Valid @RequestBody NewClientRequest request) {
         return clientService.update(userId, clientId, request);
     }
 
-    @PreAuthorize("hasRole('CONTENT_MANAGER')")
-    @DeleteMapping(value = "/protected/clients/{clientId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('SERVICE')")
+    @DeleteMapping(value = "/private/clients/{clientId}")
     public void deleteClient(@PathVariable UUID clientId) {
         clientService.deleteById(clientId);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping(value = "/protected/admin/clients/{clientId}/activation", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('SERVICE')")
+    @PatchMapping(value = "/private/clients/{clientId}/activation")
     public ClientResponse activation(@PathVariable UUID clientId) {
         return clientService.activation(clientId);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping(value = "/protected/admin/clients/{clientId}/deactivation", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('SERVICE')")
+    @PatchMapping(value = "/private/clients/{clientId}/deactivation")
     public ClientResponse deactivation(@PathVariable UUID clientId) {
         return clientService.deactivation(clientId);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping(value = "/protected/admin/clients/{clientId}/roles/{roleId}/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('SERVICE')")
+    @PatchMapping(value = "/private/clients/{clientId}/roles/{roleId}/add")
     public ClientResponse addRole(@PathVariable UUID clientId, @PathVariable UUID roleId) {
         return clientService.addRole(clientId, roleId);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping(value = "/protected/admin/clients/{clientId}/roles/{roleId}/delete", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('SERVICE')")
+    @PatchMapping(value = "/private/clients/{clientId}/roles/{roleId}/delete")
     public ClientResponse removeRole(@PathVariable UUID clientId, @PathVariable UUID roleId) {
         return clientService.removeRole(clientId, roleId);
     }

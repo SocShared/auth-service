@@ -37,6 +37,8 @@ public class JwtTokenProvider {
     private long validityRefreshTokenInMilliseconds;
     @Value("${jwt.service_token.expired}")
     private long validityServiceTokenInMilliseconds;
+    @Value("${service.id}")
+    private String serviceId;
 
     private final SessionService sessionService;
     private final UserRepository userRepository;
@@ -143,15 +145,25 @@ public class JwtTokenProvider {
     public UserDetails getUserDetails(String token) {
         Claims claims =  Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
         ArrayList<String> roles = claims.get("roles", ArrayList.class);
+        String roleService = claims.get("role", String.class);
 
-        return SpringUserDetails.builder()
-                .authorities(roles.stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role)).collect(Collectors.toList()))
-                .username(claims.get("username", String.class))
-                .firstName(claims.get("firstname", String.class))
-                .lastName(claims.get("lastname", String.class))
-                .email(claims.get("email", String.class))
-                .accountNonLocked(claims.get("account_non_locked", Boolean.class))
-                .build();
+        if (roles != null) {
+            return SpringUserDetails.builder()
+                    .authorities(roles.stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role)).collect(Collectors.toList()))
+                    .username(claims.get("username", String.class))
+                    .firstName(claims.get("firstname", String.class))
+                    .lastName(claims.get("lastname", String.class))
+                    .email(claims.get("email", String.class))
+                    .accountNonLocked(claims.get("account_non_locked", Boolean.class))
+                    .build();
+        } else if (roleService != null) {
+            return SpringUserDetails.builder()
+                    .authorities(Collections.singleton(new SimpleGrantedAuthority("ROLE_" + roleService)))
+                    .username(claims.get("from_service", String.class))
+                    .accountNonLocked(true)
+                    .build();
+        }
+        throw new AuthenticationException("invalid user details token");
     }
 
     public ServiceTokenResponse buildServiceToken(ServiceTokenRequest request) {
@@ -186,6 +198,23 @@ public class JwtTokenProvider {
                 .toService(request.getToServiceId().toString())
                 .token(builder.compact())
                 .build();
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            Jws<Claims> claims = getJwsClaimsFromToken(token);
+            String toServiceId = claims.getBody().get("to_service", String.class);
+            if (serviceId.equals(toServiceId)) {
+                return validateServiceToken(token);
+            }
+        } catch (JwtException | IllegalArgumentException exc) {
+            if (exc instanceof ExpiredJwtException) {
+                log.warn("JWT Token is expired.");
+            } else {
+                log.warn("JWT Token is invalid.");
+            }
+        }
+        return validateAccessToken(token);
     }
 
     public boolean validateAccessToken(String token) {
