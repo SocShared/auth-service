@@ -18,8 +18,7 @@ public class RegistrationController {
 
     private final UserService service;
 
-    @PostMapping(value = "/api/v1/public/users", produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @PostMapping(value = "/api/v1/public/users", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public UserResponse add(@Valid @RequestBody NewUserRequest request) {
         return service.add(request);
     }

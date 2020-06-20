@@ -20,14 +20,12 @@ public class ServiceAccessController {
 
     private final STokenService service;
 
-    @PostMapping(value = "/public/service/token", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @PostMapping(value = "/public/service/token", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ServiceTokenResponse getServiceToken(@Valid @RequestBody ServiceTokenRequest request) {
         return service.getToken(request);
     }
 
-    @PostMapping(value = "/public/service/validate_token", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @PostMapping(value = "/public/service/validate_token", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public SuccessResponse checkValidateToken(@Valid @RequestBody CheckTokenRequest request) {
         return service.checkValidateToken(request);
     }
