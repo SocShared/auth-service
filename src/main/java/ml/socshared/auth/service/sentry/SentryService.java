@@ -20,6 +20,7 @@ public class SentryService {
     public void logMessage(String message, Map<String, String> tags, Map<String, Object> extras) {
         addTagsAndExtrasToSentryContext(tags, extras);
         Sentry.capture(message);
+        Sentry.clearContext();
     }
 
     private void addTagsAndExtrasToSentryContext(Map<String, String> tags, Map<String, Object> extras) {
