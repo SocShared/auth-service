@@ -15,7 +15,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @ToString
-@Table(name = "authorization_code", uniqueConstraints={@UniqueConstraint(columnNames={"user_id", "client_id"})})
+@Table(name = "authorization_code")
 @EqualsAndHashCode(callSuper = false)
 public class AuthorizationCode extends BaseEntity {
 
