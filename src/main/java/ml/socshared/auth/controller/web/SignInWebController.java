@@ -68,7 +68,7 @@ public class SignInWebController {
     @PostMapping("/signin")
     public String signIn(@RequestParam(name = "client_id", required = false) UUID clientId, @RequestParam(name = "response_type", required = false) String responseType,
                          @RequestParam(name = "state", required = false) String state, @RequestParam(name = "redirect_uri", required = false) String redirectUri,
-                         @Valid @ModelAttribute("user") AuthRequest request, BindingResult bindingResult, HttpServletResponse response) {
+                         @ModelAttribute("user") AuthRequest request, BindingResult bindingResult, HttpServletResponse response) {
         if (bindingResult.hasErrors())
             return "signin";
         OAuthFlowRequest req = new OAuthFlowRequest();

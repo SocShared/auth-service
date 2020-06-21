@@ -15,11 +15,7 @@ import javax.validation.constraints.Pattern;
 @ToString
 public class AuthRequest {
 
-    @NotNull
-    @Pattern(regexp = "[a-zA-Z0-9+=_\\s]{3,60}", message = "Username должен состоять только из букв, цифр и нижнего подчеркивания")
     private String username;
-    @NotNull
-    @ValidPassword
     private String password;
 
 }
