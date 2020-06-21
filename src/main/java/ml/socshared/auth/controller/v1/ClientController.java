@@ -27,12 +27,11 @@ import java.util.UUID;
 public class ClientController {
 
     private final ClientService clientService;
-    private final JwtTokenProvider jwtTokenProvider;
 
     @PreAuthorize("hasRole('SERVICE')")
     @GetMapping(value = "/private/clients")
-    public Page<ClientModel> findAllClients(@Valid @NotNull @RequestParam(name = "page", required = false) Integer page,
-                                            @Valid @NotNull @RequestParam(name = "size", required = false) Integer size) {
+    public Page<ClientModel> findAllClients(@RequestParam(name = "page", defaultValue = "0") Integer page,
+                                            @RequestParam(name = "size", defaultValue = "10") Integer size) {
         return clientService.findAll(page, size);
     }
 
@@ -51,8 +50,8 @@ public class ClientController {
     @PreAuthorize("hasRole('SERVICE')")
     @GetMapping(value = "/private/users/{userId}/clients")
     public Page<ClientModel> findByUserId(@PathVariable UUID userId,
-                                          @Valid @NotNull @RequestParam(name = "page", required = false) Integer page,
-                                          @Valid @NotNull @RequestParam(name = "size", required = false) Integer size) {
+                                          @RequestParam(name = "page", defaultValue = "0") Integer page,
+                                          @RequestParam(name = "size", defaultValue = "10") Integer size) {
         return clientService.findByUserId(userId, page, size);
     }
 

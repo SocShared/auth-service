@@ -30,7 +30,6 @@ public class UserController {
 
     private final UserService userService;
     private final SessionService sessionService;
-    private final JwtTokenProvider jwtTokenProvider;
 
     @PreAuthorize("hasRole('SERVICE')")
     @GetMapping(value = "/private/users/{userId}")
@@ -88,7 +87,8 @@ public class UserController {
 
     @PreAuthorize("hasRole('SERVICE')")
     @GetMapping(value = "/private/users/online")
-    public Page<User> getOnlineUsers(@RequestParam(name = "page") Integer page, @RequestParam(name = "size") Integer size) {
+    public Page<User> getOnlineUsers(@RequestParam(name = "page", defaultValue = "0") Integer page,
+                                     @RequestParam(name = "size", defaultValue = "10") Integer size) {
         return userService.getOnlineUsers(page, size);
     }
 
@@ -100,7 +100,8 @@ public class UserController {
 
     @PreAuthorize("hasRole('SERVICE')")
     @GetMapping(value = "/private/users/active")
-    public Page<User> getActiveUsers(@RequestParam(name = "page") Integer page, @RequestParam(name = "size") Integer size) {
+    public Page<User> getActiveUsers(@RequestParam(name = "page", defaultValue = "0") Integer page,
+                                     @RequestParam(name = "size", defaultValue = "10") Integer size) {
         return sessionService.getActiveUsers(page, size);
     }
 
@@ -112,7 +113,8 @@ public class UserController {
 
     @PreAuthorize("hasRole('SERVICE')")
     @GetMapping(value = "/private/users/new")
-    public Page<User> getNewUsers(@RequestParam(name = "page") Integer page, @RequestParam(name = "size") Integer size) {
+    public Page<User> getNewUsers(@RequestParam(name = "page", defaultValue = "0") Integer page,
+                                  @RequestParam(name = "size", defaultValue = "10") Integer size) {
         return userService.getNewUsers(page, size);
     }
 
@@ -124,7 +126,8 @@ public class UserController {
 
     @PreAuthorize("hasRole('SERVICE')")
     @GetMapping(value = "/private/users/all")
-    public Page<User> getAllUsers(@RequestParam(name = "page") Integer page, @RequestParam(name = "size") Integer size) {
+    public Page<User> getAllUsers(@RequestParam(name = "page", defaultValue = "0") Integer page,
+                                  @RequestParam(name = "size", defaultValue = "10") Integer size) {
         return userService.findAll(page, size);
     }
 
