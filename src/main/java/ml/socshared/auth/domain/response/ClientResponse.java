@@ -2,6 +2,8 @@ package ml.socshared.auth.domain.response;
 
 import lombok.*;
 import ml.socshared.auth.entity.Client;
+import ml.socshared.auth.entity.Role;
+import ml.socshared.auth.entity.User;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -16,9 +18,10 @@ public class ClientResponse {
     private UUID clientId;
     private UUID clientSecret;
     private String name;
-    private Client.AccessType activeType;
+    private Client.AccessType accessType;
     private String validRedirectUri;
-    private Set<String> roles;
+    private Set<Role> roles;
+    private User user;
 
     public ClientResponse() {}
 
@@ -26,12 +29,10 @@ public class ClientResponse {
         this.clientId = client.getClientId();
         this.clientSecret = client.getClientSecret();
         this.name = client.getName();
-        this.activeType = client.getAccessType();
+        this.accessType = client.getAccessType();
         this.validRedirectUri = client.getValidRedirectUri();
-        this.roles = new LinkedHashSet<>();
-        if (client.getRoles() != null) {
-            client.getRoles().forEach(role -> roles.add(role.getName()));
-        }
+        this.roles = client.getRoles();
+        this.user = client.getUser();
     }
 
 }
