@@ -2,7 +2,7 @@ package ml.socshared.auth.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ml.socshared.auth.domain.response.ActiveUsersResponse;
+import ml.socshared.auth.domain.response.stat.ActiveUsersResponse;
 import ml.socshared.auth.repository.UserRepository;
 import ml.socshared.auth.service.SessionService;
 import ml.socshared.auth.entity.Session;

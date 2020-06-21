@@ -7,10 +7,11 @@ import ml.socshared.auth.client.MailSenderClient;
 import ml.socshared.auth.domain.model.TokenObject;
 import ml.socshared.auth.domain.model.UserModel;
 import ml.socshared.auth.domain.request.*;
-import ml.socshared.auth.domain.response.AllUsersResponse;
-import ml.socshared.auth.domain.response.NewUsersResponse;
+import ml.socshared.auth.domain.response.stat.AllUsersResponse;
+import ml.socshared.auth.domain.response.stat.NewUsersResponse;
 import ml.socshared.auth.domain.response.SuccessResponse;
 import ml.socshared.auth.domain.response.UserResponse;
+import ml.socshared.auth.domain.response.stat.OnlineUsersResponse;
 import ml.socshared.auth.entity.GeneratingCode;
 import ml.socshared.auth.entity.User;
 import ml.socshared.auth.entity.Role;
@@ -359,6 +360,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public OnlineUsersResponse onlineUsers() {
+        Long onlineUsers = userRepository.countByTimeOnlineAfter(LocalDateTime.now().minusSeconds(30));
+        log.info("online users -> {}", onlineUsers);
+        return OnlineUsersResponse.builder()
+                .onlineUsers(onlineUsers)
+                .build();
+    }
+
+    @Override
     public NewUsersResponse newUsers() {
         Long newUsers = userRepository.countByCreatedAtAfter(LocalDateTime.now().minusDays(5));
         log.info("new users -> {}", newUsers);
@@ -370,7 +380,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public AllUsersResponse allUsers() {
         Long allUsers = userRepository.count();
-        log.info("new users -> {}", allUsers);
+        log.info("all users -> {}", allUsers);
         return AllUsersResponse.builder()
                 .allUsers(allUsers)
                 .build();
