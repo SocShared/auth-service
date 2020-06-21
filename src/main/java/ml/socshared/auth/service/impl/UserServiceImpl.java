@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ml.socshared.auth.client.MailSenderClient;
 import ml.socshared.auth.domain.model.TokenObject;
-import ml.socshared.auth.domain.model.UserModel;
 import ml.socshared.auth.domain.request.*;
 import ml.socshared.auth.domain.response.stat.AllUsersResponse;
 import ml.socshared.auth.domain.response.stat.NewUsersResponse;
@@ -15,7 +14,6 @@ import ml.socshared.auth.domain.response.stat.OnlineUsersResponse;
 import ml.socshared.auth.entity.GeneratingCode;
 import ml.socshared.auth.entity.User;
 import ml.socshared.auth.entity.Role;
-import ml.socshared.auth.entity.base.Status;
 import ml.socshared.auth.exception.impl.EmailIsExistsException;
 import ml.socshared.auth.exception.impl.HttpNotFoundException;
 import ml.socshared.auth.exception.impl.UsernameAndEmailIsExistsException;
@@ -161,13 +159,7 @@ public class UserServiceImpl implements UserService {
     public SuccessResponse deleteById(UUID id) {
         log.info("deleting by id -> {}", id);
 
-        User user = userRepository.findById(id).orElse(null);
-        if (user != null) {
-            user.setStatus(Status.DELETE);
-            user.setEmail(user.getEmail() + "\\" + user.getUserId());
-            user.setUsername(user.getUsername() + "\\" + user.getUserId());
-            user = userRepository.save(user);
-        }
+        userRepository.findById(id).ifPresent(user -> userRepository.deleteById(id));
         SuccessResponse successResponse = new SuccessResponse();
         successResponse.setSuccess(true);
 
@@ -221,32 +213,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserModel> findAll(Integer page, Integer size) {
+    public Page<User> findAll(Integer page, Integer size) {
         log.info("find all");
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<UserModel> users = userRepository.findAllUsers(pageable);
+        Page<User> users = userRepository.findAll(pageable);
 
         Map<String, Object> additionalData = new HashMap<>();
         sentrySender.sentryMessage("get users", additionalData, Collections.singletonList(SentryTag.GET_USERS));
 
         return users;
-    }
-
-    @Override
-    public UserResponse activation(UUID id) {
-        log.info("activation by id -> {}", id);
-
-        return new UserResponse(userRepository.setStatus(id, Status.ACTIVE)
-                .orElseThrow(() -> new HttpNotFoundException("Not found user by id: " + id)));
-    }
-
-    @Override
-    public UserResponse deactivation(UUID id) {
-        log.info("deactivating by id -> {}", id);
-
-        return new UserResponse(userRepository.setStatus(id, Status.NOT_ACTIVE)
-                .orElseThrow(() -> new HttpNotFoundException("Not found user by id: " + id)));
     }
 
     @Override
@@ -360,7 +336,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public OnlineUsersResponse onlineUsers() {
+    public OnlineUsersResponse onlineUsersCount() {
         Long onlineUsers = userRepository.countByTimeOnlineAfter(LocalDateTime.now().minusSeconds(30));
         log.info("online users -> {}", onlineUsers);
         return OnlineUsersResponse.builder()
@@ -369,7 +345,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public NewUsersResponse newUsers() {
+    public Page<User> getOnlineUsers(Integer page, Integer size) {
+        return userRepository.findByTimeOnlineAfter(LocalDateTime.now().minusSeconds(30), PageRequest.of(page, size));
+    }
+
+    @Override
+    public NewUsersResponse newUsersCount() {
         Long newUsers = userRepository.countByCreatedAtAfter(LocalDateTime.now().minusDays(5));
         log.info("new users -> {}", newUsers);
         return NewUsersResponse.builder()
@@ -378,7 +359,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AllUsersResponse allUsers() {
+    public Page<User> getNewUsers(Integer page, Integer size) {
+        return userRepository.findByCreatedAtAfter(LocalDateTime.now().minusDays(5), PageRequest.of(page, size));
+    }
+
+    @Override
+    public AllUsersResponse allUsersCount() {
         Long allUsers = userRepository.count();
         log.info("all users -> {}", allUsers);
         return AllUsersResponse.builder()

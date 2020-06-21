@@ -1,5 +1,6 @@
 package ml.socshared.auth.entity.base;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
@@ -22,6 +23,7 @@ public abstract class BaseEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @JsonIgnore
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private Status status;

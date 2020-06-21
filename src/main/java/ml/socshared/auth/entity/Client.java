@@ -1,5 +1,7 @@
 package ml.socshared.auth.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import ml.socshared.auth.entity.base.Status;
@@ -35,15 +37,18 @@ public class Client extends BaseEntity {
     @Column(name = "valid_redirect_uri")
     private String validRedirectUri;
 
+    @JsonManagedReference
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "clients_roles",
             joinColumns = {@JoinColumn(name = "client_id", referencedColumnName = "client_id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "role_id")})
     private Set<Role> roles;
 
+    @JsonBackReference
     @OneToMany(mappedBy = "client", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private Set<Session> sessions;
 
+    @JsonManagedReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user;

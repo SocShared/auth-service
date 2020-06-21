@@ -21,14 +21,17 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     Optional<User> findByUsername(String username);
     Optional<User> findByEmail(String email);
+    Page<User> findByCreatedAtAfter(LocalDateTime localDateTime, Pageable pageable);
+    Page<User> findByTimeOnlineAfter(LocalDateTime localDateTime, Pageable pageable);
     @Query("select u from User u where u.status = 'ACTIVE' or u.status = 'NOT_ACTIVE'")
-    Page<UserModel> findAllUsers(Pageable pageable);
+    Page<User> findActiveAndNotActiveUsers(Pageable pageable);
     @Query("select u from User u where u.status = 'ACTIVE'")
-    Page<UserModel> findActiveUsers(Pageable pageable);
+    Page<User> findActiveUsers(Pageable pageable);
     @Query("select u from User u where u.status = 'NOT_ACTIVE'")
-    Page<UserModel> findNotActiveUsers(Pageable pageable);
+    Page<User> findNotActiveUsers(Pageable pageable);
     @Query("select u from User u where u.status = 'DELETE'")
-    Page<UserModel> findDeletedUsers(Pageable pageable);
+    Page<User> findDeletedUsers(Pageable pageable);
+
     @Transactional
     @Modifying
     @Query("update User u set u.status = :status where u.userId = :id")

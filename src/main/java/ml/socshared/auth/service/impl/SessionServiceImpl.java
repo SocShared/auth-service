@@ -3,12 +3,15 @@ package ml.socshared.auth.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ml.socshared.auth.domain.response.stat.ActiveUsersResponse;
+import ml.socshared.auth.entity.User;
 import ml.socshared.auth.repository.UserRepository;
 import ml.socshared.auth.service.SessionService;
 import ml.socshared.auth.entity.Session;
 import ml.socshared.auth.repository.SessionRepository;
 import ml.socshared.auth.service.sentry.SentrySender;
 import ml.socshared.auth.service.sentry.SentryTag;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -49,14 +52,19 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public ActiveUsersResponse activeUsers() {
+    public ActiveUsersResponse activeUsersCount() {
         long time = new Date().getTime();
-        log.info("time long -> {}", time);
-        Long active = sessionRepository.activeUsers(time);
+        Long active = sessionRepository.activeUsersCount(time);
         log.info("active users -> {}", active);
         return ActiveUsersResponse.builder()
                 .activeUsers(active)
                 .build();
+    }
+
+    @Override
+    public Page<User> getActiveUsers(Integer page, Integer size) {
+        long time = new Date().getTime();
+        return sessionRepository.activeUsers(time, PageRequest.of(page, size));
     }
 
     @Scheduled(cron = "0 0 23 * * *")
@@ -71,7 +79,7 @@ public class SessionServiceImpl implements SessionService {
     @Scheduled(cron = "0 0 0 * * *")
     public void activeUsersStat() {
         long time = new Date().getTime();
-        long active = sessionRepository.activeUsers(time);
+        long active = sessionRepository.activeUsersCount(time);
         Map<String, Object> additionalData = new HashMap<>();
         additionalData.put("active_users", active);
         sentrySender.sentryMessage("active users", additionalData, Collections.singletonList(SentryTag.ACTIVE_USERS));
