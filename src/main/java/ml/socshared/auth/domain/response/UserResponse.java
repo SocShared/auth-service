@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
 import lombok.Setter;
 import ml.socshared.auth.config.CustomLocalDateTimeSerializer;
+import ml.socshared.auth.entity.Role;
 import ml.socshared.auth.entity.User;
 
 import java.time.LocalDateTime;
@@ -22,7 +23,7 @@ public class UserResponse {
     private String lastname;
     @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
     private LocalDateTime timeOnline;
-    private Set<String> roles;
+    private Set<Role> roles;
 
     public UserResponse() {}
 
@@ -33,9 +34,6 @@ public class UserResponse {
         this.firstname = user.getFirstname();
         this.lastname = user.getLastname();
         this.timeOnline = user.getTimeOnline();
-        this.roles = new LinkedHashSet<>();
-        if (user.getRoles() != null) {
-            user.getRoles().forEach(role -> roles.add(role.getName()));
-        }
+        this.roles = user.getRoles();
     }
 }
