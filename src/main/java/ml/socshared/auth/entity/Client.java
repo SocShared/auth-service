@@ -20,11 +20,11 @@ import java.util.UUID;
 public class Client extends BaseEntity {
 
     @Id
-    @Column(name = "client_id", nullable = false, unique = true)
+    @Column(name = "client_id", nullable = false)
     private UUID clientId;
 
     @GeneratedValue
-    @Column(name = "client_secret", nullable = false, unique = true)
+    @Column(name = "client_secret", nullable = false)
     private UUID clientSecret;
 
     @Column(name = "name")

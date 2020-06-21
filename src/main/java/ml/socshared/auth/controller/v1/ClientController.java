@@ -30,7 +30,7 @@ public class ClientController {
 
     @PreAuthorize("hasRole('SERVICE')")
     @GetMapping(value = "/private/clients")
-    public Page<ClientModel> findAllClients(@RequestParam(name = "page", defaultValue = "0") Integer page,
+    public Page<Client> findAllClients(@RequestParam(name = "page", defaultValue = "0") Integer page,
                                             @RequestParam(name = "size", defaultValue = "10") Integer size) {
         return clientService.findAll(page, size);
     }
@@ -49,7 +49,7 @@ public class ClientController {
 
     @PreAuthorize("hasRole('SERVICE')")
     @GetMapping(value = "/private/users/{userId}/clients")
-    public Page<ClientModel> findByUserId(@PathVariable UUID userId,
+    public Page<Client> findByUserId(@PathVariable UUID userId,
                                           @RequestParam(name = "page", defaultValue = "0") Integer page,
                                           @RequestParam(name = "size", defaultValue = "10") Integer size) {
         return clientService.findByUserId(userId, page, size);

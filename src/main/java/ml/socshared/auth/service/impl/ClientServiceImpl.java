@@ -117,11 +117,15 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public ClientResponse deleteById(UUID id) {
+    public SuccessResponse deleteById(UUID id) {
         log.info("deleting by id -> {}", id);
 
-        return new ClientResponse(clientRepository.setStatus(id, Status.DELETE)
-                .orElseThrow(() -> new HttpNotFoundException("Not found user by id: " + id)));
+        clientRepository.findById(id).ifPresent(client -> clientRepository.deleteById(id));
+
+        SuccessResponse successResponse = new SuccessResponse();
+        successResponse.setSuccess(true);
+
+        return successResponse;
     }
 
     @Override
@@ -132,7 +136,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public Page<ClientModel> findAll(Integer page, Integer size) {
+    public Page<Client> findAll(Integer page, Integer size) {
         log.info("find all");
         Pageable pageable = PageRequest.of(page, size);
         return clientRepository.findAllClients(pageable);
@@ -185,10 +189,10 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public Page<ClientModel> findByUserId(UUID userId, Integer page, Integer size) {
+    public Page<Client> findByUserId(UUID userId, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<ClientModel> clients = clientRepository.findByUserId(userId, pageable);
+        Page<Client> clients = clientRepository.findByUserId(userId, pageable);
 
         Map<String, Object> additionalData = new HashMap<>();
         additionalData.put("user_id", userId);
