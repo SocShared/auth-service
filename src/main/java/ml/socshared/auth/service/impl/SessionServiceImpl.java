@@ -59,9 +59,9 @@ public class SessionServiceImpl implements SessionService {
                 .build();
     }
 
-    @Scheduled(cron = "30 * * * * *")
+    @Scheduled(cron = "0 0 23 * * *")
     public void onlineUsersStat() {
-        long onlineUsers = userRepository.countByTimeOnlineAfter(LocalDateTime.now().minusSeconds(90));
+        long onlineUsers = userRepository.countByTimeOnlineAfter(LocalDateTime.now().minusDays(1));
         Map<String, Object> additionalData = new HashMap<>();
         additionalData.put("online_users", onlineUsers);
 
