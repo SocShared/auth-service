@@ -159,14 +159,19 @@ public class OAuthServiceImpl implements OAuthService {
 
         AuthorizationCode authorizationCode = authorizationCodeService.findById(request.getCode());
 
-        if (authorizationCode != null && authorizationCode.getRedirectUri().equals(request.getRedirectUri())
-                && authorizationCodeService.validateCode(request.getCode())) {
+        if (authorizationCode != null && authorizationCode.getRedirectUri().equals(request.getRedirectUri()) &&
+            authorizationCode.getRedirectUri().equals(client.getValidRedirectUri())) {
 
-            Map<String, Object> additionalData = new HashMap<>();
-            sentrySender.sentryMessage("get token by authorization code", additionalData, Collections.singletonList(SentryTag.GET_TOKEN_BY_CLIENT_CREDENTIALS));
+            if (authorizationCodeService.validateCode(request.getCode())) {
 
-            return jwtTokenProvider.createTokenByUserAndClient(
-                    userRepository.findById(authorizationCode.getUserId()).orElse(new User()), client);
+                Map<String, Object> additionalData = new HashMap<>();
+                sentrySender.sentryMessage("get token by authorization code", additionalData, Collections.singletonList(SentryTag.GET_TOKEN_BY_CLIENT_CREDENTIALS));
+
+                return jwtTokenProvider.createTokenByUserAndClient(
+                        userRepository.findById(authorizationCode.getUserId()).orElse(new User()), client);
+            }
+        } else {
+            throw new AuthenticationException("redirect uri invalid");
         }
 
         throw new AuthenticationException("Authentication failed");
