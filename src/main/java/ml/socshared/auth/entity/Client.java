@@ -1,6 +1,7 @@
 package ml.socshared.auth.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @Table(name = "oauth2_client_details")
 @ToString
 @EqualsAndHashCode(callSuper = false)
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Client extends BaseEntity {
 
     @Id
