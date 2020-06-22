@@ -35,5 +35,6 @@ public interface UserService {
     NewUsersResponse newUsersCount();
     Page<User> getNewUsers(Integer page, Integer size);
     AllUsersResponse allUsersCount();
+    SuccessResponse sendMailConfirmed(UUID userId);
 
 }

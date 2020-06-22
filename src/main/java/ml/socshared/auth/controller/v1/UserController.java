@@ -2,6 +2,7 @@ package ml.socshared.auth.controller.v1;
 
 import lombok.RequiredArgsConstructor;
 import ml.socshared.auth.domain.request.UpdateUserRequest;
+import ml.socshared.auth.domain.response.SuccessResponse;
 import ml.socshared.auth.domain.response.UserResponse;
 import ml.socshared.auth.domain.response.stat.ActiveUsersResponse;
 import ml.socshared.auth.domain.response.stat.AllUsersResponse;
@@ -129,6 +130,12 @@ public class UserController {
     public Page<User> getAllUsers(@RequestParam(name = "page", defaultValue = "0") Integer page,
                                   @RequestParam(name = "size", defaultValue = "10") Integer size) {
         return userService.findAll(page, size);
+    }
+
+    @PreAuthorize("hasRole('SERVICE')")
+    @PostMapping(value = "/private/users/{userId}/mail/confirmed")
+    public SuccessResponse sendMailConfirmed(@PathVariable UUID userId) {
+        return userService.sendMailConfirmed(userId);
     }
 
 }

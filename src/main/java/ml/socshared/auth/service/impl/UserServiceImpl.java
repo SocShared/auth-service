@@ -89,6 +89,22 @@ public class UserServiceImpl implements UserService {
 
         User u = userRepository.save(user);
 
+        sendMailConfirmed(u.getUserId());
+
+        UserResponse userResponse = new UserResponse(u);
+
+        Map<String, Object> additionalData = new HashMap<>();
+        additionalData.put("user_data", userResponse);
+        sentrySender.sentryMessage("registration user", additionalData, Collections.singletonList(SentryTag.REGISTRATION_USER));
+
+        return userResponse;
+    }
+
+    @Override
+    public SuccessResponse sendMailConfirmed(UUID userId) {
+        User u = userRepository.findById(userId)
+                .orElseThrow(() -> new HttpNotFoundException("Not found user by id"));
+
         String link = GeneratorLinks.build();
         GeneratingCode code = new GeneratingCode();
         code.setGeneratingLink(link);
@@ -99,18 +115,15 @@ public class UserServiceImpl implements UserService {
         GeneratingCode c = generatingCodeRepository.save(code);
         mailSenderClient.sendMailConfirm(SendMessageGeneratingCodeRequest.builder()
                 .subject("SocShared - Подтвердите электронную почту")
-                .username(user.getUsername())
+                .username(u.getUsername())
                 .toEmail(u.getEmail())
                 .link(mainHost + "account/" + c.getGeneratingLink())
                 .build(), "Bearer " + token.getToken());
 
-        UserResponse userResponse = new UserResponse(u);
+        SuccessResponse successResponse = new SuccessResponse();
+        successResponse.setSuccess(true);
 
-        Map<String, Object> additionalData = new HashMap<>();
-        additionalData.put("user_data", userResponse);
-        sentrySender.sentryMessage("registration user", additionalData, Collections.singletonList(SentryTag.REGISTRATION_USER));
-
-        return userResponse;
+        return successResponse;
     }
 
     @Override
