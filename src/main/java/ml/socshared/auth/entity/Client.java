@@ -18,7 +18,6 @@ import java.util.UUID;
 @Table(name = "oauth2_client_details")
 @ToString
 @EqualsAndHashCode(callSuper = false)
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Client extends BaseEntity {
 
     @Id
@@ -47,11 +46,11 @@ public class Client extends BaseEntity {
     private Set<Role> roles;
 
     @JsonBackReference
-    @OneToMany(mappedBy = "client", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "client", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private Set<Session> sessions;
 
     @JsonManagedReference
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user;
 

@@ -28,12 +28,12 @@ public class Session extends BaseEntity {
     private Boolean offlineSession;
 
     @JsonManagedReference
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "client_id", referencedColumnName = "client_id")
     private Client client;
 
     @JsonManagedReference
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user;
 
