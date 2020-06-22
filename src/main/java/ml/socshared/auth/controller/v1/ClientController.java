@@ -62,10 +62,10 @@ public class ClientController {
     }
 
     @PreAuthorize("hasRole('SERVICE')")
-    @PatchMapping(value = "/private/users/{userId}/clients/{clientId}")
-    public ClientResponse updateClient(@PathVariable UUID userId, @PathVariable UUID clientId,
+    @PutMapping(value = "/private/users/{userId}/clients/{clientId}")
+    public void updateClient(@PathVariable UUID userId, @PathVariable UUID clientId,
                                        @Valid @RequestBody NewClientRequest request) {
-        return clientService.update(userId, clientId, request);
+        clientService.update(userId, clientId, request);
     }
 
     @PreAuthorize("hasRole('SERVICE')")
