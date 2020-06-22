@@ -69,15 +69,15 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('SERVICE')")
-    @PatchMapping(value = "/private/users/{userId}")
-    public UserResponse updateData(@PathVariable UUID userId, @Valid @RequestBody UpdateUserRequest request) {
-        return userService.update(userId, request);
+    @PutMapping(value = "/private/users/{userId}")
+    public void updateData(@PathVariable UUID userId, @Valid @RequestBody UpdateUserRequest request) {
+        userService.update(userId, request);
     }
 
     @PreAuthorize("hasRole('SERVICE')")
-    @PatchMapping(value = "/private/users/{userId}/password")
-    public UserResponse updatePassword(@PathVariable UUID userId, @Valid @RequestBody UpdatePasswordRequest request) {
-        return userService.updatePassword(userId, request);
+    @PutMapping(value = "/private/users/{userId}/password")
+    public void updatePassword(@PathVariable UUID userId, @Valid @RequestBody UpdatePasswordRequest request) {
+        userService.updatePassword(userId, request);
     }
 
     @PreAuthorize("hasRole('SERVICE')")
