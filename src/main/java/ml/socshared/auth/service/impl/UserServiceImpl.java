@@ -130,21 +130,23 @@ public class UserServiceImpl implements UserService {
     public UserResponse update(UUID id, UpdateUserRequest request) {
         log.info("saving -> {}", request);
 
-        User user = userRepository.findById(id).orElseThrow(
+        User userById = userRepository.findById(id).orElseThrow(
                 () -> new HttpNotFoundException("Not found user by id: " + id)
         );
 
-        if (userRepository.findByEmail(request.getEmail()).orElse(null) != null) {
+        User userByEmail = userRepository.findByEmail(request.getEmail()).orElse(null);
+
+        if (userByEmail != null && !userById.getUserId().equals(userByEmail.getUserId())) {
             throw new EmailIsExistsException();
         }
 
-        user.setEmail(request.getEmail());
-        user.setFirstname(request.getFirstname());
-        user.setLastname(request.getLastname());
+        userById.setEmail(request.getEmail());
+        userById.setFirstname(request.getFirstname());
+        userById.setLastname(request.getLastname());
 
-        user = userRepository.save(user);
+        userById = userRepository.save(userById);
 
-        return new UserResponse(user);
+        return new UserResponse(userById);
     }
 
     @Override
