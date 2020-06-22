@@ -64,11 +64,11 @@ public class User extends BaseEntity {
     private Set<Role> roles;
 
     @JsonBackReference
-    @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST)
     private Set<Session> sessions;
 
     @JsonBackReference
-    @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST)
     private Set<Client> clients;
 
     public User() {

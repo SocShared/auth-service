@@ -45,7 +45,7 @@ public class Client extends BaseEntity {
     private Set<Role> roles;
 
     @JsonBackReference
-    @OneToMany(mappedBy = "client", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "client", cascade = CascadeType.PERSIST)
     private Set<Session> sessions;
 
     @JsonManagedReference
