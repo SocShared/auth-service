@@ -19,11 +19,14 @@ public class UserResponse {
     private UUID userId;
     private String username;
     private String email;
+    private Boolean emailVerified;
     private String firstname;
     private String lastname;
     @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
     private LocalDateTime timeOnline;
     private Set<Role> roles;
+    private Boolean accountNonLocked;
+    private Boolean resetPassword;
 
     public UserResponse() {}
 
@@ -35,5 +38,8 @@ public class UserResponse {
         this.lastname = user.getLastname();
         this.timeOnline = user.getTimeOnline();
         this.roles = user.getRoles();
+        this.emailVerified = user.getEmailVerified();
+        this.accountNonLocked = user.getAccountNonLocked();
+        this.resetPassword = user.getResetPassword();
     }
 }
