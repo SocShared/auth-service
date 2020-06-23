@@ -10,6 +10,7 @@ import ml.socshared.auth.entity.Session;
 import ml.socshared.auth.repository.SessionRepository;
 import ml.socshared.auth.service.sentry.SentrySender;
 import ml.socshared.auth.service.sentry.SentryTag;
+import net.javacrumbs.shedlock.core.SchedulerLock;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -68,6 +69,7 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Scheduled(cron = "0 0 23 * * *")
+    @SchedulerLock(name = "online-users-stat")
     public void onlineUsersStat() {
         long onlineUsers = userRepository.countByTimeOnlineAfter(LocalDateTime.now().minusDays(1));
         Map<String, Object> additionalData = new HashMap<>();
@@ -77,6 +79,7 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Scheduled(cron = "0 0 17 * * *")
+    @SchedulerLock(name = "active-users-stat")
     public void activeUsersStat() {
         long time = new Date().getTime();
         long active = sessionRepository.activeUsersCount(time);
@@ -86,6 +89,7 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Scheduled(cron = "0 0 17 * * *")
+    @SchedulerLock(name = "new-users-stat")
     public void newUsersStat() {
         long newUsers = userRepository.countByCreatedAtAfter(LocalDateTime.now().minusDays(5));
         Map<String, Object> additionalData = new HashMap<>();
@@ -95,6 +99,7 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Scheduled(cron = "0 0 17 * * *")
+    @SchedulerLock(name = "all-users-stat")
     public void allUsersStat() {
         long allUsers = userRepository.count();
         Map<String, Object> additionalData = new HashMap<>();
