@@ -2,10 +2,10 @@ version: '3.7'
 services:
   auth-service:
     image: vee97/socshared-auth-service
-    deploy:
-      replicas: 3
-      restart_policy:
-        condition: on-failure
+#    deploy:
+#      replicas: 3
+#      restart_policy:
+#        condition: on-failure
     ports:
       - 9999:9999
     env_file:
