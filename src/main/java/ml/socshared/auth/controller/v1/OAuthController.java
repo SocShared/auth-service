@@ -23,12 +23,13 @@ public class OAuthController {
 
     private final OAuthService oAuthService;
 
-    @PostMapping(value = "/oauth/token")
+    @PostMapping(value = "/oauth/token", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public OAuth2TokenResponse getTokenByForm(@RequestParam Map<String, String> oAuthFlowRequest) {
         return getToken(OAuthFlowRequest.fromMap(oAuthFlowRequest));
     }
 
-    @PostMapping(value = "/oauth/token", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @PostMapping(value = "/oauth/token", produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public OAuth2TokenResponse getToken(@Valid @RequestBody OAuthFlowRequest oAuthFlowRequest) {
 
         switch (oAuthFlowRequest.getGrantType()) {
@@ -44,7 +45,8 @@ public class OAuthController {
         throw new OAuth2Exception("GrantType undefined.");
     }
 
-    @PostMapping(value = "/oauth/validate_token", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @PostMapping(value = "/oauth/validate_token", produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
+                consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public SuccessResponse isValidateToken(@Valid @RequestBody CheckTokenRequest request) {
         return oAuthService.checkValidateAccessToken(request);
     }
