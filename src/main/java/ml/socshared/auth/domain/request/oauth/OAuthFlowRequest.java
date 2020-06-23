@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
 import java.util.Map;
@@ -13,6 +14,7 @@ import java.util.Map;
 @Setter
 @ToString
 @EqualsAndHashCode
+@Slf4j
 public class OAuthFlowRequest {
 
     @JsonProperty("client_id")
@@ -35,6 +37,8 @@ public class OAuthFlowRequest {
     private TypeFlow grantType;
 
     public static OAuthFlowRequest fromMap(Map<String, String> map) {
+        log.info(map.toString());
+
         OAuthFlowRequest request = new OAuthFlowRequest();
         request.setClientId(map.get("client_id"));
         request.setClientSecret(map.get("client_secret"));
