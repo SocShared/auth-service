@@ -62,7 +62,7 @@ public class SignInWebController {
                 setCookies(response, res.getAccessToken(), res.getRefreshToken());
             }
         }
-        return "redirect:https://socshared.ml/social";
+        return "redirect:https://socshared.ml/lk";
     }
 
     @PostMapping("/signin")
@@ -89,7 +89,7 @@ public class SignInWebController {
         }
         if (clientId != null && responseType != null && state != null && redirectUri != null)
             return "redirect:" + String.format("/oauth/authorize?client_id=%s&response_type=%s&state=%s&redirect_uri=%s", clientId, responseType, state, redirectUri);
-        return "redirect:https://socshared.ml/social";
+        return "redirect:https://socshared.ml/lk";
     }
 
     public void setCookies(HttpServletResponse response, String accessToken, String refreshToken) {

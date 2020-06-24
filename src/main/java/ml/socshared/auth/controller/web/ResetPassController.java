@@ -73,7 +73,7 @@ public class ResetPassController {
                 response.addCookie(refreshToken);
             }
         }
-        return "redirect:https://socshared.ml/social";
+        return "redirect:https://socshared.ml/lk";
     }
 
     @PostMapping("/resetpass")
