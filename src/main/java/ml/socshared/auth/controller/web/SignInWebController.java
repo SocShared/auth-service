@@ -96,7 +96,7 @@ public class SignInWebController {
         Cookie accessTokenCookie = new Cookie("JWT_AT", accessToken);
         accessTokenCookie.setMaxAge(24 * 60 * 60);
         accessTokenCookie.setSecure(true);
-        accessTokenCookie.setHttpOnly(true);
+        accessTokenCookie.setHttpOnly(false);
         accessTokenCookie.setPath("/");
         accessTokenCookie.setDomain("socshared.ml");
         response.addCookie(accessTokenCookie);
@@ -104,7 +104,7 @@ public class SignInWebController {
         Cookie refreshTokenCookie = new Cookie("JWT_RT", refreshToken);
         refreshTokenCookie.setMaxAge(24 * 60 * 60 * 30);
         refreshTokenCookie.setSecure(true);
-        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setHttpOnly(false);
         refreshTokenCookie.setPath("/");
         refreshTokenCookie.setDomain("socshared.ml");
         response.addCookie(refreshTokenCookie);
