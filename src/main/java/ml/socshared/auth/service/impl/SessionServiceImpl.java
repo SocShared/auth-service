@@ -68,7 +68,7 @@ public class SessionServiceImpl implements SessionService {
         return sessionRepository.activeUsers(time, PageRequest.of(page, size));
     }
 
-    @Scheduled(cron = "0 0 23 * * *")
+    @Scheduled(cron = "0 0 20 * * *")
     @SchedulerLock(name = "online-users-stat")
     public void onlineUsersStat() {
         long onlineUsers = userRepository.countByTimeOnlineAfter(LocalDateTime.now().minusDays(1));
@@ -78,7 +78,7 @@ public class SessionServiceImpl implements SessionService {
         sentrySender.sentryMessage("online users", additionalData, Collections.singletonList(SentryTag.ONLINE_USERS));
     }
 
-    @Scheduled(cron = "0 0 17 * * *")
+    @Scheduled(cron = "0 0 14 * * *")
     @SchedulerLock(name = "active-users-stat")
     public void activeUsersStat() {
         long time = new Date().getTime();
@@ -88,7 +88,7 @@ public class SessionServiceImpl implements SessionService {
         sentrySender.sentryMessage("active users", additionalData, Collections.singletonList(SentryTag.ACTIVE_USERS));
     }
 
-    @Scheduled(cron = "0 0 17 * * *")
+    @Scheduled(cron = "0 0 14 * * *")
     @SchedulerLock(name = "new-users-stat")
     public void newUsersStat() {
         long newUsers = userRepository.countByCreatedAtAfter(LocalDateTime.now().minusDays(5));
@@ -98,7 +98,7 @@ public class SessionServiceImpl implements SessionService {
         sentrySender.sentryMessage("new users", additionalData, Collections.singletonList(SentryTag.NEW_USERS));
     }
 
-    @Scheduled(cron = "0 0 17 * * *")
+    @Scheduled(cron = "0 0 14 * * *")
     @SchedulerLock(name = "all-users-stat")
     public void allUsersStat() {
         long allUsers = userRepository.count();
