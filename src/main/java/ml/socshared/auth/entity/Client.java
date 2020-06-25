@@ -39,7 +39,7 @@ public class Client extends BaseEntity {
     private String validRedirectUri;
 
     @JsonManagedReference
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinTable(name = "clients_roles",
             joinColumns = {@JoinColumn(name = "client_id", referencedColumnName = "client_id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "role_id")})
